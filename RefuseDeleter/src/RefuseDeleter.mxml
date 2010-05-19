@@ -2,7 +2,7 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   creationComplete="_init()">
+					   creationComplete="init()">
 	<s:layout>
 		<s:VerticalLayout paddingBottom="20"
 						  paddingLeft="20"
@@ -10,28 +10,141 @@
 						  paddingTop="20"
 						  gap="10"/>
 	</s:layout>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		
+		global{
+			modalTransparency: 0.5;
+			modalTransparencyBlur: 0;
+			modalTransparencyColor: #FFFFFF;
+			modalTransparencyDuration: 0;
+		}
+	</fx:Style>
 	<fx:Script>
 		<![CDATA[
+			import jp.progression.commands.Func;
+			import jp.progression.commands.Wait;
+			import jp.progression.commands.lists.SerialList;
+			
 			import mx.controls.Alert;
 			import mx.events.CloseEvent;
-			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+
+			private static const ASYNC_RESUME_COUNT:Number = 10;
 
 			[Bindable]
 			private var _dir:File;
 			private var _fileArr:Array;
 
-			protected function delete_clickHandler(event:MouseEvent):void
-			{
-				Alert.show("カスファイルを削除します。\nこの処理はキャンセルできませんが、\n実行しますか？", "気をつけてね", 3, null, _onAlertClose);
-			}
+			private var _progressPanel:ProgressPanel;
 
-			private function _init():void
+			private var _cmd:SerialList;
+			private var _asyncCnt:int;
+
+			/**
+			 * アプリケーションを初期化します。
+			 */
+			protected function init():void
 			{
 				this.addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, onNativeDragEnter);
 				this.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP, onNativeDragDrop);
+				nativeApplication.addEventListener(Event.EXITING, onExiting);
+				
+				_progressPanel = new ProgressPanel();
+				_progressPanel.path = this;
+				
+				resumeSharedObject();
 			}
 
-			private function onNativeDragEnter(e:NativeDragEvent):void
+			/**
+			 * ファイル検索前に準備を行います。
+			 */
+			protected function searchPreparation(selectedFile:File):void
+			{
+				if (!selectedFile && !selectedFile.isDirectory)
+					return;
+
+				_tiPath.text = selectedFile.nativePath;
+
+				searchFiles();
+			}
+
+			protected function searchFiles():void
+			{
+				var self:* = this;
+
+				// 非同期処理用コマンドの作成
+				_cmd = new SerialList();
+				_cmd.addCommand(
+					// 初期化
+					function():void{
+						_fileArr = [];
+						_fileArrCl.source = _fileArr;
+						_fileNum = _fileArr.length;
+						_asyncCnt = 0;
+						PopUpManager.addPopUp(_progressPanel, self, true);
+						PopUpManager.centerPopUp(_progressPanel);
+					},
+					// 検索開始
+					new Func(searchCore, [_dir]),
+					// 終了処理
+					function():void{
+						_fileArrCl.source = _fileArr;
+						_fileNum = _fileArr.length;
+						PopUpManager.removePopUp(_progressPanel);
+					}
+					);
+				// コマンドの実行
+				_cmd.execute();
+			}
+
+			/**
+			 * フォルダリスティングのコア処理です。
+			 */
+			protected function searchCore(target:File):void
+			{
+				if (!target)
+					return;
+
+				if (target.isDirectory)
+				{
+					if (_cbSVN.selected && target.name == ".svn")
+					{
+						_fileArr.push(target);
+					}
+					else
+					{
+						var files:Array = target.getDirectoryListing();
+						for (var i:int = 0; i < files.length; i++)
+						{
+							var element:File = files[i] as File;
+
+							// コマンドを追加(再帰処理)
+							_cmd.insertCommand(
+								new Func(searchCore, [element]),
+								// ASYNC_RESUME_COUNT 回ごとに1回休憩する(フレームを進ませる)
+								_asyncCnt++ % ASYNC_RESUME_COUNT == 0
+								? new Wait(0.005)
+								: null
+								);
+						}
+					}
+				}
+				else
+				{
+					if (_cbDSStore.selected && target.name == ".DS_Store")
+					{
+						_fileArr.push(target);
+					}
+					if (_cbThumb.selected && target.name == "Thumbs.db")
+					{
+						_fileArr.push(target);
+					}
+				}
+			}
+
+			protected function onNativeDragEnter(e:NativeDragEvent):void
 			{
 				var data:Clipboard = e.clipboard;
 				if (data.hasFormat(ClipboardFormats.FILE_LIST_FORMAT))
@@ -40,57 +153,45 @@
 				}
 			}
 
-			private function onNativeDragDrop(event:NativeDragEvent):void
+			protected function onNativeDragDrop(event:NativeDragEvent):void
 			{
 				// クリップボードからデータを取り出す
 				var clipboard:Clipboard = event.clipboard;
 				var list:Array = clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
 
-				onFileSelected(_dir = list[0]);
+				searchPreparation(_dir = list[0]);
 			}
 
-			private function _showFileChooser():void
+			protected function onBrowseBtnClick():void
 			{
 				_dir = new File();
-
-				_dir.addEventListener(Event.SELECT, onSelect);
-				
-				try
-				{
-					_dir.browseForDirectory("フォルダを選択");
-				}
-				catch (e:Error)
-				{
-					trace(e.getStackTrace());
-				}
+				_dir.addEventListener(Event.SELECT, onFileBrowseSelect, false, 0, true);
+				_dir.browseForDirectory("フォルダを選択");
 			}
 
-			private function onSelect(event:Event):void
+			protected function onFileBrowseSelect(event:Event):void
 			{
-				onFileSelected(event.target as File);
+				searchPreparation(event.target as File);
 			}
 
-			// ファイル選択時の処理
-			private function onFileSelected(selectedFile:File):void
+			protected function onDeleteClick(event:MouseEvent):void
 			{
-				if (!selectedFile && !selectedFile.isDirectory)
+				Alert.show(
+					"カスファイル" + _fileNum + "項目を削除します。\n" +
+					"この処理はキャンセルできませんが、\n" +
+					"実行しますか？",
+					"気をつけてね", 3, null, onAlertClose);
+			}
+
+			protected function onCheckBoxChange(event:Event):void
+			{
+				if (!_dir)
 					return;
 
-				path.text = selectedFile.nativePath;
-
-				_searchKasu();
+				searchFiles();
 			}
 
-			private function _searchKasu():void
-			{
-				_fileArr = [];
-				_search(_dir);
-				_fileArrCl.source = _fileArr;
-
-				_fileNum = _fileArr.length;
-			}
-
-			private function _onAlertClose(e:CloseEvent):void
+			protected function onAlertClose(e:CloseEvent):void
 			{
 				if (e.detail == Alert.YES)
 				{
@@ -98,63 +199,55 @@
 					{
 						var element:File = _fileArr[i];
 						if (element.isDirectory)
-						{
 							element.deleteDirectory(true);
-						}
 						else
-						{
 							element.deleteFile();
-						}
 					}
 
-					_searchKasu();
+					searchFiles();
 					Alert.show("カスを削除しました", "完了");
-
 				}
 			}
-
-			private function _search(directory:File):void
+			
+			private function onExiting(event:Event):void
 			{
-				if (!directory)
-					return;
+				suspendSharedObject();
+			}
 
-				if (directory.isDirectory)
-				{
-					if (cbSVN.selected && directory.name == ".svn")
-					{
-						_fileArr.push(directory);
-					}
-					else
-					{
-						var files:Array = directory.getDirectoryListing();
-						for (var i:int = 0; i < files.length; i++)
-						{
-							var element:File = files[i] as File;
-							_search(element);
-						}
-					}
-				}
-				else
-				{
-					if (cbDSStore.selected && directory.name == ".DS_Store")
-					{
-						_fileArr.push(directory);
-					}
-					if (cbThumb.selected && directory.name == "Thumbs.db")
-					{
-						_fileArr.push(directory);
-					}
-				}
+			/**
+			 * 非同期コマンドを中断します。
+			 */
+			internal function interruptSearch():void
+			{
+				_cmd.interrupt();
+
+				_fileArr = [];
+				_fileArrCl.source = _fileArr;
+				_fileNum = _fileArr.length;
+
+				PopUpManager.removePopUp(_progressPanel);
 			};
-
-			protected function cb_changeHandler(event:Event):void
+			
+			protected function suspendSharedObject():void
 			{
-				if (!_dir)
-					return;
-				
-				_searchKasu();
+				var so:SharedObject = SharedObject.getLocal("config");
+				so.data.config = {
+					_cbThumb : _cbThumb.selected,
+					_cbDSStore : _cbDSStore.selected,
+					_cbSVN : _cbSVN.selected
+				};
+				so.flush();
 			}
-
+			protected function resumeSharedObject():void
+			{
+				var so:SharedObject = SharedObject.getLocal("config");
+				if(so.data.config)
+				{
+					_cbThumb.selected = so.data.config._cbThumb;
+					_cbDSStore.selected = so.data.config._cbDSStore;
+					_cbSVN.selected = so.data.config._cbSVN; 
+				}
+			}
 		]]>
 	</fx:Script>
 
@@ -170,40 +263,40 @@
 
 	<s:HGroup>
 		<s:Button label="フォルダを選択"
-				  click="_showFileChooser()"/>
+				  click="onBrowseBtnClick()"/>
 		<s:Label text="もしくはフォルダをドラッグ＆ドロップしてください"/>
 	</s:HGroup>
 
 	<s:Label text="削除するファイル/フォルダ"/>
 	<s:HGroup>
-		<s:CheckBox id="cbThumb"
+		<s:CheckBox id="_cbThumb"
 					label="Thumb.db"
 					selected="true"
-					change="cb_changeHandler(event)"/>
-		<s:CheckBox id="cbDSStore"
+					change="onCheckBoxChange(event)"/>
+		<s:CheckBox id="_cbDSStore"
 					label=".DS_Store"
 					selected="true"
-					change="cb_changeHandler(event)"/>
-		<s:CheckBox id="cbSVN"
+					change="onCheckBoxChange(event)"/>
+		<s:CheckBox id="_cbSVN"
 					label=".svn フォルダ"
-					selected="true"
-					change="cb_changeHandler(event)"/>
+					selected="false"
+					change="onCheckBoxChange(event)"/>
 	</s:HGroup>
 
 	<s:Label text="選択したフォルダ"/>
-	<s:TextInput id="path"
+	<s:TextInput id="_tiPath"
 				 width="100%"
 				 editable="false"/>
 
 	<s:Label text="{'見つかったカスファイル (' + _fileNum + '項目)'}"/>
-	<s:List id="fileList"
+	<s:List id="_listFile"
 			width="100%"
 			height="100%"
 			dataProvider="{_fileArrCl}"
 			labelField="nativePath"/>
 
-	<s:Button label="カスを削除する"
-			  click="delete_clickHandler(event)"
+	<s:Button label="カスファイルを削除する"
+			  click="onDeleteClick(event)"
 			  enabled="{_fileNum > 0}"
 			  width="100%"
 			  height="30"/>
