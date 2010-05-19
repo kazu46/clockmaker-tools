@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   creationComplete="_init()">
+	<s:layout>
+		<s:VerticalLayout paddingBottom="20"
+						  paddingLeft="20"
+						  paddingRight="20"
+						  paddingTop="20"
+						  gap="10"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+
+			[Bindable]
+			private var _dir:File;
+			private var _fileArr:Array;
+
+			protected function delete_clickHandler(event:MouseEvent):void
+			{
+				Alert.show("カスファイルを削除します。\nこの処理はキャンセルできませんが、\n実行しますか？", "気をつけてね", 3, null, _onAlertClose);
+			}
+
+			private function _init():void
+			{
+				this.addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, onNativeDragEnter);
+				this.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP, onNativeDragDrop);
+			}
+
+			private function onNativeDragEnter(e:NativeDragEvent):void
+			{
+				var data:Clipboard = e.clipboard;
+				if (data.hasFormat(ClipboardFormats.FILE_LIST_FORMAT))
+				{
+					NativeDragManager.acceptDragDrop(this);
+				}
+			}
+
+			private function onNativeDragDrop(event:NativeDragEvent):void
+			{
+				// クリップボードからデータを取り出す
+				var clipboard:Clipboard = event.clipboard;
+				var list:Array = clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
+
+				onFileSelected(_dir = list[0]);
+			}
+
+			private function _showFileChooser():void
+			{
+				_dir = new File();
+
+				_dir.addEventListener(Event.SELECT, onSelect);
+				
+				try
+				{
+					_dir.browseForDirectory("フォルダを選択");
+				}
+				catch (e:Error)
+				{
+					trace(e.getStackTrace());
+				}
+			}
+
+			private function onSelect(event:Event):void
+			{
+				onFileSelected(event.target as File);
+			}
+
+			// ファイル選択時の処理
+			private function onFileSelected(selectedFile:File):void
+			{
+				if (!selectedFile && !selectedFile.isDirectory)
+					return;
+
+				path.text = selectedFile.nativePath;
+
+				_searchKasu();
+			}
+
+			private function _searchKasu():void
+			{
+				_fileArr = [];
+				_search(_dir);
+				_fileArrCl.source = _fileArr;
+
+				_fileNum = _fileArr.length;
+			}
+
+			private function _onAlertClose(e:CloseEvent):void
+			{
+				if (e.detail == Alert.YES)
+				{
+					for (var i:int = 0; i < _fileArr.length; i++)
+					{
+						var element:File = _fileArr[i];
+						if (element.isDirectory)
+						{
+							element.deleteDirectory(true);
+						}
+						else
+						{
+							element.deleteFile();
+						}
+					}
+
+					_searchKasu();
+					Alert.show("カスを削除しました", "完了");
+
+				}
+			}
+
+			private function _search(directory:File):void
+			{
+				if (!directory)
+					return;
+
+				if (directory.isDirectory)
+				{
+					if (cbSVN.selected && directory.name == ".svn")
+					{
+						_fileArr.push(directory);
+					}
+					else
+					{
+						var files:Array = directory.getDirectoryListing();
+						for (var i:int = 0; i < files.length; i++)
+						{
+							var element:File = files[i] as File;
+							_search(element);
+						}
+					}
+				}
+				else
+				{
+					if (cbDSStore.selected && directory.name == ".DS_Store")
+					{
+						_fileArr.push(directory);
+					}
+					if (cbThumb.selected && directory.name == "Thumbs.db")
+					{
+						_fileArr.push(directory);
+					}
+				}
+			};
+
+			protected function cb_changeHandler(event:Event):void
+			{
+				if (!_dir)
+					return;
+				
+				_searchKasu();
+			}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- 非ビジュアルエレメント (サービス、値オブジェクトなど) をここに配置 -->
+		<s:ArrayCollection id="_fileArrCl"/>
+		<fx:uint id="_fileNum"/>
+	</fx:Declarations>
+
+	<s:Label text="カス削除くん"
+			 fontSize="20"
+			 fontWeight="bold"/>
+
+	<s:HGroup>
+		<s:Button label="フォルダを選択"
+				  click="_showFileChooser()"/>
+		<s:Label text="もしくはフォルダをドラッグ＆ドロップしてください"/>
+	</s:HGroup>
+
+	<s:Label text="削除するファイル/フォルダ"/>
+	<s:HGroup>
+		<s:CheckBox id="cbThumb"
+					label="Thumb.db"
+					selected="true"
+					change="cb_changeHandler(event)"/>
+		<s:CheckBox id="cbDSStore"
+					label=".DS_Store"
+					selected="true"
+					change="cb_changeHandler(event)"/>
+		<s:CheckBox id="cbSVN"
+					label=".svn フォルダ"
+					selected="true"
+					change="cb_changeHandler(event)"/>
+	</s:HGroup>
+
+	<s:Label text="選択したフォルダ"/>
+	<s:TextInput id="path"
+				 width="100%"
+				 editable="false"/>
+
+	<s:Label text="{'見つかったカスファイル (' + _fileNum + '項目)'}"/>
+	<s:List id="fileList"
+			width="100%"
+			height="100%"
+			dataProvider="{_fileArrCl}"
+			labelField="nativePath"/>
+
+	<s:Button label="カスを削除する"
+			  click="delete_clickHandler(event)"
+			  enabled="{_fileNum > 0}"
+			  width="100%"
+			  height="30"/>
+
+</s:WindowedApplication>
