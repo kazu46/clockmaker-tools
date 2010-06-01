@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx">
+
+	<fx:Script>
+		<![CDATA[
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				var clipboard:Clipboard = Clipboard.generalClipboard;
+				var str:String = clipboard.getData(ClipboardFormats.TEXT_FORMAT) as String;
+				clipboard.setData(ClipboardFormats.TEXT_FORMAT, str);
+
+				textArea.text = str;
+			}
+		]]>
+	</fx:Script>
+
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center"
+						  paddingBottom="10"
+						  paddingLeft="10"
+						  paddingRight="10"
+						  paddingTop="10"/>
+	</s:layout>
+
+	<fx:Declarations>
+		<!-- 非ビジュアルエレメント (サービス、値オブジェクトなど) をここに配置 -->
+	</fx:Declarations>
+
+	<s:Button click="button1_clickHandler(event)"
+			  label="プレーンテキストにする"/>
+
+	<s:Label text="次の内容がクリップボードにコピーされています"/>
+	<s:TextArea editable="false"
+				id="textArea"
+				width="100%"
+				height="100%"/>
+
+</s:WindowedApplication>
