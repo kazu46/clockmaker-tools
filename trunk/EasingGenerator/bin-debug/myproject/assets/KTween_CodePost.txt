@@ -1,0 +1,17 @@
+    ];
+    var bezier:BezierSegment = null;
+    for (var i:int = 0; i < points.length - 1; i++) {
+        if (t >= points[i].point[0] && t <= points[i+1].point[0]) {
+            bezier = new BezierSegment(
+                new Point(points[i].point[0], points[i].point[1]),
+                new Point(points[i].post[0], points[i].post[1]),
+                new Point(points[i+1].pre[0], points[i+1].pre[1]),
+                new Point(points[i+1].point[0], points[i+1].point[1]));
+            break;
+        }
+    }
+    return bezier.getYForX(t);
+};
+
+// Apply easing function such as...
+//KTween.to(target_mc, 4, {x:400}, ease);

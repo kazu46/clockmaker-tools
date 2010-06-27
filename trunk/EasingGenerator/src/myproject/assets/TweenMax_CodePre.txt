@@ -1,0 +1,7 @@
+import flash.geom.Point;
+import fl.motion.BezierSegment;
+import com.greensock.TweenMax;
+
+// Custom Easing Function for TweenMax
+var ease:Function = function(t:Number, b:Number, c:Number, d:Number):Number{
+    var points:Array = [

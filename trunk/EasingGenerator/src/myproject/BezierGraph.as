@@ -16,6 +16,9 @@ package myproject
 	
 	import mx.managers.PopUpManager;
 	
+	import myproject.assets.EmbedText;
+	import myproject.data.Preset;
+	import myproject.data.PresetData;
 	import myproject.preview.MoveMonitor;
 	import myproject.preview.RotateMonitor;
 	import myproject.preview.ScaleMonitor;
@@ -34,11 +37,11 @@ package myproject
 		 * グラフの矩形領域です。
 		 */
 		public static const GRAPH_RECT:Rectangle = new Rectangle(35, 10, GRAPH_STEP_W * 24, GRAPH_STEP_H * 20);
-		
+
 		/**
-		 * 0〜100%の領域を示すグラフの矩形領域です。 
+		 * 0〜100%の領域を示すグラフの矩形領域です。
 		 */
-		public static const PERCENT_RECT:Rectangle = new Rectangle(0, GRAPH_STEP_H * 5, GRAPH_STEP_W * 24, GRAPH_STEP_H * 10);
+		public static const PERCENT_RECT:Rectangle = new Rectangle(0, GRAPH_STEP_H * 4, GRAPH_STEP_W * 24, GRAPH_STEP_H * 12);
 
 		/**
 		 * シングルトン参照です。
@@ -48,46 +51,43 @@ package myproject
 		private static const GRAPH_STEP_W:Number = 24;
 		private static const GRAPH_STEP_H:Number = 17;
 
-		[Embed(source="assets/BetweenAS3_CodePre.txt", mimeType="application/octet-stream")]
-		private static const CODE_PRE_BETWEENAS3:Class;
-		[Embed(source="assets/BetweenAS3_CodePost.txt", mimeType="application/octet-stream")]
-		private static const CODE_POST_BETWEENAS3:Class;
-		[Embed(source="assets/Tweener_CodePre.txt", mimeType="application/octet-stream")]
-		private static const CODE_PRE_TWEENER:Class;
-		[Embed(source="assets/Tweener_CodePost.txt", mimeType="application/octet-stream")]
-		private static const CODE_POST_TWEENER:Class;
-
 		/**
 		 * 新しい BezierGraph インスタンスを作成します。
 		 */
 		public function BezierGraph()
 		{
 			instance = this;
-			
+
 			_monitorMove = new MoveMonitor();
 			_monitorMove.x = 70;
 			_monitorMove.y = 390;
 			addChild(_monitorMove);
-			
+
 			_monitorScale = new ScaleMonitor();
 			_monitorScale.x = 520;
 			_monitorScale.y = 390;
 			addChild(_monitorScale);
-			
+
 			_monitorRotate = new RotateMonitor();
 			_monitorRotate.x = 620;
 			_monitorRotate.y = 390;
 			addChild(_monitorRotate);
-			
+
 			_container.addChild(_division);
 			_container.addChild(_canvas);
 			addChild(_container);
 
+			_debugCanvas = new Shape();
+			_debugCanvas.x = GRAPH_RECT.left + PERCENT_RECT.left;
+			_debugCanvas.y = GRAPH_RECT.top;
+			addChild(_debugCanvas);
+			
 			_curveCanvas = new Shape();
 			_curveCanvas.x = GRAPH_RECT.left + PERCENT_RECT.left;
 			_curveCanvas.y = GRAPH_RECT.top + PERCENT_RECT.top;
 			addChild(_curveCanvas);
-			_curveCanvas.filters = [new DropShadowFilter(1, 90, 0, 0.4, 0, 2)]
+			_curveCanvas.filters = [new DropShadowFilter(1, 90, 0, 0.4, 0, 2)];
+			
 
 			_clickCanvas = new Sprite();
 			_clickCanvas.x = GRAPH_RECT.left + PERCENT_RECT.left;
@@ -101,9 +101,7 @@ package myproject
 			_controlCanvas.y = GRAPH_RECT.top + PERCENT_RECT.top;
 			addChild(_controlCanvas);
 
-			
-
-			reset();
+			reset(Preset.presetAC.getItemAt(0) as PresetData);
 			_drawDivision();
 			initUI();
 			_updateEase();
@@ -119,7 +117,8 @@ package myproject
 		private var _division:Shape = new Shape();
 		private var _controls:Vector.<BezierPoint>;
 		private var _controlCanvas:Sprite = new Sprite();
-		private var _curveCanvas:Shape = new Shape();
+		private var _curveCanvas:Shape;
+		private var _debugCanvas:Shape;
 		private var _monitorMove:MoveMonitor;
 		private var _monitorScale:ScaleMonitor;
 		private var _monitorRotate:RotateMonitor;
@@ -175,14 +174,14 @@ package myproject
 			var index:int = _controls.indexOf(target);
 			_controls.splice(index, 1);
 			_controlCanvas.removeChild(target);
-			
+
 			_update(null);
 		}
 
 		/**
 		 * リセットします。
 		 */
-		public function reset():void
+		public function reset(preset:PresetData):void
 		{
 			var i:int;
 			if (_controls)
@@ -195,10 +194,22 @@ package myproject
 				}
 			}
 
-			_controls = Vector.<BezierPoint>([
-				new BezierPoint(0, 0, true, null, new Point(0.2, 0.2)),
-				new BezierPoint(1, 1, true, new Point(0.8, 0.8), null),
-				]);
+			_controls = new Vector.<BezierPoint>();
+			var controls:Array = preset.data;
+			for (i = 0; i < controls.length; i++)
+			{
+				var lock:Boolean = i == 0 || i == controls.length - 1;
+				var pre:Point = controls[i].pre
+					? new Point(controls[i].pre[0], controls[i].pre[1])
+					: null;
+				var post:Point = controls[i].post
+					? new Point(controls[i].post[0], controls[i].post[1])
+					: null;
+				_controls[i] = new BezierPoint(
+					new Point(controls[i].point[0], controls[i].point[1]),
+					lock, pre, post
+					);
+			}
 
 			for (i = 0; i < _controls.length; i++)
 			{
@@ -206,7 +217,10 @@ package myproject
 				_controlCanvas.addChild(_controls[i]);
 			}
 
+
 			_update(null);
+			
+//			_debugDraw(preset.func);
 		}
 
 		public function getDragbleRect(target:BezierPoint):Rectangle
@@ -222,7 +236,7 @@ package myproject
 			return rect;
 		}
 
-		public function copy():void
+		public function copy():String
 		{
 			var str:String = "";
 
@@ -235,16 +249,32 @@ package myproject
 			}
 
 			if (engine == "Tweener")
-				str = new CODE_PRE_TWEENER + str + new CODE_POST_TWEENER;
+				str = new EmbedText.CODE_PRE_TWEENER + str + new EmbedText.CODE_POST_TWEENER;
 			else if (engine == "BetweenAS3")
-				str = new CODE_PRE_BETWEENAS3 + str + new CODE_POST_BETWEENAS3;
+				str = new EmbedText.CODE_PRE_BETWEENAS3 + str + new EmbedText.CODE_POST_BETWEENAS3;
+			else if (engine == "KTween")
+				str = new EmbedText.CODE_PRE_KTWEEN + str + new EmbedText.CODE_POST_KTWEEN;
+			else if (engine == "TweenMax")
+				str = new EmbedText.CODE_PRE_TWEENMAX + str + new EmbedText.CODE_POST_TWEENMAX;
 
-			Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, str);
+			return str;
+		}
 
-			var alert:AlertWindow = new AlertWindow();
-			alert.code = str;
-			PopUpManager.addPopUp(alert, EasingGenerator.instance, true);
-			PopUpManager.centerPopUp(alert);
+		private function _debugDraw(ease:IEasing):void
+		{
+			_debugCanvas.graphics.clear();
+			_debugCanvas.graphics.lineStyle(1, 0xAAAAAA);
+			_debugCanvas.graphics.moveTo(PERCENT_RECT.left, PERCENT_RECT.bottom);
+			for (var t:Number = 0.0; t <= 1.0; t += 0.01)
+			{
+				var num:Number = ease.calculate(t, 0.0, 1.0, 1.0);
+				_debugCanvas.graphics.lineTo(
+					PERCENT_RECT.width * t,
+					PERCENT_RECT.bottom - PERCENT_RECT.height * num);
+			}
+			_debugCanvas.graphics.lineTo(
+				PERCENT_RECT.width,
+				PERCENT_RECT.bottom - PERCENT_RECT.height);
 		}
 
 		private function _digit(value:Number, ratio:Number = 100):Number
@@ -259,17 +289,11 @@ package myproject
 			_curveCanvas.graphics.clear();
 			_clickCanvas.graphics.clear();
 
-//			for (i = 0; i < _controls.length; i++)
-//			{
-//				_controls[i].x = _controls[i].tx * (PERCENT_RECT.width);
-//				_controls[i].y = (1 - _controls[i].ty) * (PERCENT_RECT.height) - PERCENT_RECT.y;
-//			}
-
 			// bezier init
 			_curveCanvas.graphics.moveTo(_controls[0].x, _controls[0].y);
 			_curveCanvas.graphics.lineStyle(1, 0x000000);
 			_clickCanvas.graphics.moveTo(_controls[0].x, _controls[0].y);
-			_clickCanvas.graphics.lineStyle(20, 0xFF0000, 0);
+			_clickCanvas.graphics.lineStyle(10, 0xFF0000, 0);
 
 			// bezier loop
 			for (i = 0; i < _controls.length - 1; i++)
@@ -294,7 +318,7 @@ package myproject
 				_controlCanvas.mouseX / PERCENT_RECT.width,
 				1 - _controlCanvas.mouseY / PERCENT_RECT.height);
 
-			_currentPoint = new BezierPoint(p.x, p.y, false, new Point(p.x, p.y), new Point(p.x, p.y));
+			_currentPoint = new BezierPoint(new Point(p.x, p.y), false, new Point(p.x, p.y), new Point(p.x, p.y));
 			_currentPoint.addEventListener(Event.CHANGE, _onChange);
 			_controlCanvas.addChild(_currentPoint);
 			_controls.push(_currentPoint);
@@ -409,13 +433,13 @@ package myproject
 				if (j != GRAPH_RECT.height && (j / GRAPH_RECT.height * 100) % 10 == 0)
 				{
 					new Label(
-						_container, 
-						38, 
-						j + GRAPH_RECT.top + 3, 
+						_container,
+						38,
+						j + GRAPH_RECT.top + 3,
 						Math.round((1 - 2 * j / GRAPH_RECT.height) * 100) + 40 + "%");
 				}
 			}
-			
+
 			_division.graphics.lineStyle(1, 0x808080);
 			_division.graphics.moveTo(0, PERCENT_RECT.top);
 			_division.graphics.lineTo(GRAPH_RECT.width, PERCENT_RECT.top);
@@ -426,7 +450,7 @@ package myproject
 			_division.graphics.lineTo(GRAPH_RECT.width, PERCENT_RECT.top + 1);
 			_division.graphics.moveTo(0, PERCENT_RECT.bottom + 1);
 			_division.graphics.lineTo(GRAPH_RECT.width, PERCENT_RECT.bottom + 1);
-			
+
 			_division.x = GRAPH_RECT.x;
 			_division.y = GRAPH_RECT.y;
 		}

@@ -1,0 +1,16 @@
+    ];
+    var bezier:BezierSegment = null;
+    for (var i:int = 0; i < points.length - 1; i++) {
+        if (t / d >= points[i].point[0] && t / d <= points[i+1].point[0]) {
+            bezier = new BezierSegment(
+                new Point(points[i].point[0], points[i].point[1]),
+                new Point(points[i].post[0], points[i].post[1]),
+                new Point(points[i+1].pre[0], points[i+1].pre[1]),
+                new Point(points[i+1].point[0], points[i+1].point[1]));
+            break;
+        }
+    }
+    return c * bezier.getYForX(t / d) + b;
+};
+// Apply easing function such as...
+//TweenMax.to(target_mc, 4, {x:400, ease:ease});
