@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   width="500"
+			   height="300"
+			   backgroundColor="0xDDDDDD"
+			   skinClass="myproject.skins.MyTitleWindowSkin"
+			   close="close()">
+	<s:layout>
+		<s:VerticalLayout paddingTop="10"
+						  paddingBottom="10"
+						  paddingLeft="10"
+						  paddingRight="10"
+						  horizontalAlign="center"
+						  gap="10"/>
+	</s:layout>
+
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			import spark.skins.spark.TitleWindowSkin;
+
+			[Bindable]
+			public var code:String;
+
+			private function close():void
+			{
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</fx:Script>
+
+	<s:Label text="Copied ActionScript Code"/>
+	<s:TextArea id="ta"
+				text="{code}"
+				editable="false"
+				fontFamily="_typewriter"
+				fontSize="10"
+				width="100%"
+				height="100%"/>
+	<s:Button label="OK"
+			  width="100"
+			  height="18"
+			  click="close()"/>
+</s:TitleWindow>

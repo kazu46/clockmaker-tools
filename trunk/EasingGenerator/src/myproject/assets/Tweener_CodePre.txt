@@ -1,0 +1,7 @@
+import flash.geom.Point;
+import fl.motion.BezierSegment;
+import caurina.transitions.Tweener;
+
+// Custom Easing Function for Tweener
+var ease:Function = function(t:Number, b:Number, c:Number, d:Number, p_params:Object = null):Number{
+    var points:Array = [
