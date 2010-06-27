@@ -1,0 +1,10 @@
+import flash.geom.Point;
+import fl.motion.BezierSegment;
+import org.libspark.betweenas3.BetweenAS3;
+import org.libspark.betweenas3.core.easing.IEasing;
+import org.libspark.betweenas3.easing.Custom;
+import org.libspark.betweenas3.tweens.ITween;
+
+// Custom Easing Function for BetweenAS3
+var ease:IEasing = Custom.func(function(t:Number, b:Number, c:Number, d:Number):Number{
+    var points:Array = [

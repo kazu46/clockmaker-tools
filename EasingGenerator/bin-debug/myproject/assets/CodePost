@@ -1,0 +1,19 @@
+	var time:Number = t / d;
+	var i:int = 0;
+	var bezier:BezierSegment = null;
+	for (i = 0; i < _controls.length - 1; i++)
+	{
+		if (time >= points[i].post[0] && time <= points[i].pre[0])
+		{
+			bezier = new BezierSegment(
+				points[i].point,
+				points[i].post,
+				points[i+1].pre,
+				points[i+1].point);
+		
+			break;
+		}
+	}
+	
+	return c * bezier.getYForX(t / d) + b;
+});

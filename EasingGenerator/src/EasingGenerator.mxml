@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   showStatusBar="false"
+					   frameRate="60"
+					   creationComplete="_onCreationComplete(event)"
+					   xmlns:local="*"
+					   xmlns:myproject="myproject.*"
+					   xmlns:ui="myproject.ui.*">
+	<fx:Declarations>
+		<!-- 非ビジュアルエレメント (サービス、値オブジェクトなど) をここに配置 -->
+		<s:RadioButtonGroup id="tweenEngine"
+							change="_onTweenEngineChange(event)"/>
+	</fx:Declarations>
+
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		
+		s|WindowedApplication{
+			background-alpha:0;
+		}
+		
+		s|Button{
+			corner-radius:0;
+			skinClass: ClassReference('myproject.skins.MyButtonSkin');
+			backgroundGradientTopColor:#e5e5e5;
+			backgroundGradientBottomColor:#c8c8c8;
+		}
+		
+		global{
+			modalTransparencyBlur: 0;
+			modalTransparency: 0;
+			modalTransparencyDuration: 0;
+		}
+		
+		
+	</fx:Style>
+
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import myproject.BezierGraph;
+			import myproject.skins.MyBorderSkin;
+
+			public static var instance:EasingGenerator;
+
+			private var bezierGraph:BezierGraph;
+
+			public function changeContainer():void
+			{
+				if (vs.selectedIndex == 1)
+					vs.selectedIndex = 0;
+				else
+					vs.selectedIndex = 1;
+			}
+
+			protected function _onCreationComplete(event:FlexEvent):void
+			{
+				instance = this;
+
+				bezierGraph = new BezierGraph();
+				canvas.addChild(bezierGraph);
+			}
+
+			protected function autoCb_changeHandler(event:Event):void
+			{
+				if (autoCb.selected)
+					bezierGraph.playPreviewLoop();
+				else
+					bezierGraph.stopPreview();
+			}
+
+			protected function _onPlayBtnClick(event:MouseEvent):void
+			{
+				bezierGraph.playPreview();
+			}
+
+			protected function _onStopBtnClick(event:MouseEvent):void
+			{
+				bezierGraph.stopPreview();
+			}
+
+			protected function _onResetBtnClick(event:MouseEvent):void
+			{
+				bezierGraph.reset();
+			}
+
+			protected function _onCopyBtnClick(event:MouseEvent):void
+			{
+				bezierGraph.copy();
+			}
+
+			protected function _onTweenEngineChange(event:Event):void
+			{
+				bezierGraph.engine = tweenEngine.selectedValue as String;
+			}
+		]]>
+	</fx:Script>
+	<s:layout>
+		<s:VerticalLayout gap="0"/>
+	</s:layout>
+	<ui:HeaderUI height="30"/>
+	<mx:ViewStack id="vs"
+				  creationPolicy="all"
+				  width="100%"
+				  height="100%">
+		<s:NavigatorContent>
+			<s:BorderContainer id="container"
+							   width="100%"
+							   height="100%"
+							   skinClass="myproject.skins.MyBorderSkin">
+				<mx:UIComponent id="canvas"/>
+				<s:Button x="622"
+						  y="10"
+						  width="100"
+						  height="18"
+						  label="Copy"
+						  click="_onCopyBtnClick(event)"/>
+				<s:Button x="622"
+						  y="333"
+						  width="100"
+						  height="18"
+						  label="Reset"
+						  click="_onResetBtnClick(event)"/>
+				<s:Button x="34"
+						  y="360"
+						  label="■"
+						  width="21"
+						  enabled="{!autoCb.selected}"
+						  click="_onStopBtnClick(event)"/>
+				<s:Button x="62"
+						  y="360"
+						  label="▶"
+						  width="21"
+						  enabled="{!autoCb.selected}"
+						  click="_onPlayBtnClick(event)"/>
+				<s:CheckBox x="105"
+							y="361"
+							label="Auto Play"
+							id="autoCb"
+							selected="true"
+							change="autoCb_changeHandler(event)"/>
+				<s:RadioButton x="623"
+							   y="45"
+							   id="tweenerRb"
+							   label="Tweener"
+							   selected="true"
+							   group="{tweenEngine}"
+							   value="Tweener"/>
+				<s:RadioButton x="623"
+							   y="69"
+							   id="betweenRb"
+							   label="BetweenAS3"
+							   group="{tweenEngine}"
+							   value="BetweenAS3"/>
+
+			</s:BorderContainer>
+		</s:NavigatorContent>
+		<s:NavigatorContent>
+			<s:BorderContainer id="dummy"
+							   width="100%"
+							   height="7"
+							   skinClass="myproject.skins.MyBorderSkin"/>
+		</s:NavigatorContent>
+	</mx:ViewStack>
+
+</s:WindowedApplication>
