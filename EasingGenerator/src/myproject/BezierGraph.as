@@ -34,6 +34,11 @@ package myproject
 		 * グラフの矩形領域です。
 		 */
 		public static const GRAPH_RECT:Rectangle = new Rectangle(35, 10, GRAPH_STEP_W * 24, GRAPH_STEP_H * 20);
+		
+		/**
+		 * 0〜100%の領域を示すグラフの矩形領域です。 
+		 */
+		public static const PERCENT_RECT:Rectangle = new Rectangle(0, GRAPH_STEP_H * 5, GRAPH_STEP_W * 24, GRAPH_STEP_H * 10);
 
 		/**
 		 * シングルトン参照です。
@@ -58,43 +63,45 @@ package myproject
 		public function BezierGraph()
 		{
 			instance = this;
-
+			
+			_monitorMove = new MoveMonitor();
+			_monitorMove.x = 70;
+			_monitorMove.y = 390;
+			addChild(_monitorMove);
+			
+			_monitorScale = new ScaleMonitor();
+			_monitorScale.x = 520;
+			_monitorScale.y = 390;
+			addChild(_monitorScale);
+			
+			_monitorRotate = new RotateMonitor();
+			_monitorRotate.x = 620;
+			_monitorRotate.y = 390;
+			addChild(_monitorRotate);
+			
 			_container.addChild(_division);
 			_container.addChild(_canvas);
 			addChild(_container);
 
 			_curveCanvas = new Shape();
-			_curveCanvas.x = GRAPH_RECT.left;
-			_curveCanvas.y = GRAPH_RECT.top;
+			_curveCanvas.x = GRAPH_RECT.left + PERCENT_RECT.left;
+			_curveCanvas.y = GRAPH_RECT.top + PERCENT_RECT.top;
 			addChild(_curveCanvas);
 			_curveCanvas.filters = [new DropShadowFilter(1, 90, 0, 0.4, 0, 2)]
 
 			_clickCanvas = new Sprite();
-			_clickCanvas.x = GRAPH_RECT.left;
-			_clickCanvas.y = GRAPH_RECT.top;
+			_clickCanvas.x = GRAPH_RECT.left + PERCENT_RECT.left;
+			_clickCanvas.y = GRAPH_RECT.top + PERCENT_RECT.top;
 			_clickCanvas.buttonMode = true;
 			_clickCanvas.addEventListener(MouseEvent.MOUSE_DOWN, _onCanvasMouseDown);
 			addChild(_clickCanvas);
 
 			_controlCanvas = new Sprite();
-			_controlCanvas.x = GRAPH_RECT.left;
-			_controlCanvas.y = GRAPH_RECT.top;
+			_controlCanvas.x = GRAPH_RECT.left + PERCENT_RECT.left;
+			_controlCanvas.y = GRAPH_RECT.top + PERCENT_RECT.top;
 			addChild(_controlCanvas);
 
-			_monitorMove = new MoveMonitor();
-			_monitorMove.x = 32;
-			_monitorMove.y = 390;
-			addChild(_monitorMove);
-
-			_monitorScale = new ScaleMonitor();
-			_monitorScale.x = 560;
-			_monitorScale.y = 390;
-			addChild(_monitorScale);
-
-			_monitorRotate = new RotateMonitor();
-			_monitorRotate.x = 640;
-			_monitorRotate.y = 390;
-			addChild(_monitorRotate);
+			
 
 			reset();
 			_drawDivision();
@@ -168,6 +175,8 @@ package myproject
 			var index:int = _controls.indexOf(target);
 			_controls.splice(index, 1);
 			_controlCanvas.removeChild(target);
+			
+			_update(null);
 		}
 
 		/**
@@ -206,7 +215,7 @@ package myproject
 
 			var rect:Rectangle = new Rectangle(
 				_controls[index - 1].x,
-				0,
+				-PERCENT_RECT.top,
 				_controls[index + 1].x - _controls[index - 1].x,
 				GRAPH_RECT.height);
 
@@ -250,11 +259,11 @@ package myproject
 			_curveCanvas.graphics.clear();
 			_clickCanvas.graphics.clear();
 
-			for (i = 0; i < _controls.length; i++)
-			{
-				_controls[i].x = _controls[i].tx * (GRAPH_RECT.width);
-				_controls[i].y = (1 - _controls[i].ty) * (GRAPH_RECT.height);
-			}
+//			for (i = 0; i < _controls.length; i++)
+//			{
+//				_controls[i].x = _controls[i].tx * (PERCENT_RECT.width);
+//				_controls[i].y = (1 - _controls[i].ty) * (PERCENT_RECT.height) - PERCENT_RECT.y;
+//			}
 
 			// bezier init
 			_curveCanvas.graphics.moveTo(_controls[0].x, _controls[0].y);
@@ -282,8 +291,8 @@ package myproject
 		private function _onCanvasMouseDown(event:MouseEvent):void
 		{
 			var p:Point = new Point(
-				_controlCanvas.mouseX / GRAPH_RECT.width,
-				1 - _controlCanvas.mouseY / GRAPH_RECT.height);
+				_controlCanvas.mouseX / PERCENT_RECT.width,
+				1 - _controlCanvas.mouseY / PERCENT_RECT.height);
 
 			_currentPoint = new BezierPoint(p.x, p.y, false, new Point(p.x, p.y), new Point(p.x, p.y));
 			_currentPoint.addEventListener(Event.CHANGE, _onChange);
@@ -328,7 +337,6 @@ package myproject
 		{
 			// カスタムイージングを作成
 			var ease:IEasing = Custom.func(function(t:Number, b:Number, c:Number, d:Number):Number{
-
 					var time:Number = t / d;
 
 					var i:int = 0;
@@ -400,9 +408,25 @@ package myproject
 
 				if (j != GRAPH_RECT.height && (j / GRAPH_RECT.height * 100) % 10 == 0)
 				{
-					new Label(_container, 38, j + GRAPH_RECT.top - 1, Math.round((1 - j / GRAPH_RECT.height) * 100) + "%");
+					new Label(
+						_container, 
+						38, 
+						j + GRAPH_RECT.top + 3, 
+						Math.round((1 - 2 * j / GRAPH_RECT.height) * 100) + 40 + "%");
 				}
 			}
+			
+			_division.graphics.lineStyle(1, 0x808080);
+			_division.graphics.moveTo(0, PERCENT_RECT.top);
+			_division.graphics.lineTo(GRAPH_RECT.width, PERCENT_RECT.top);
+			_division.graphics.moveTo(0, PERCENT_RECT.bottom);
+			_division.graphics.lineTo(GRAPH_RECT.width, PERCENT_RECT.bottom);
+			_division.graphics.lineStyle(1, 0xFFFFFFF);
+			_division.graphics.moveTo(0, PERCENT_RECT.top + 1);
+			_division.graphics.lineTo(GRAPH_RECT.width, PERCENT_RECT.top + 1);
+			_division.graphics.moveTo(0, PERCENT_RECT.bottom + 1);
+			_division.graphics.lineTo(GRAPH_RECT.width, PERCENT_RECT.bottom + 1);
+			
 			_division.x = GRAPH_RECT.x;
 			_division.y = GRAPH_RECT.y;
 		}

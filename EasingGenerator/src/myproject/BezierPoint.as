@@ -21,6 +21,7 @@ package myproject
 	{
 		private static const COLOR:int = 0x0;
 		private static const RADIUS:int = 4;
+		private static const SNAP_HEIGHT:uint = 8;
 
 
 		/**
@@ -46,7 +47,7 @@ package myproject
 
 			_main = new Sprite();
 			_main.graphics.beginFill(COLOR, 0);
-			_main.graphics.drawRect(-6, -6, 12, 12);
+			_main.graphics.drawRect(-SNAP_HEIGHT, -SNAP_HEIGHT, 12, 12);
 			_main.graphics.endFill();
 			_main.graphics.beginFill(0x5083fc);
 			_main.graphics.drawRect(-RADIUS / 2 >> 0, -RADIUS / 2 >> 0, RADIUS, RADIUS);
@@ -64,7 +65,7 @@ package myproject
 
 			_controlPre = new Sprite();
 			_controlPre.graphics.beginFill(COLOR, 0);
-			_controlPre.graphics.drawRect(-6, -6, 12, 12);
+			_controlPre.graphics.drawRect(-SNAP_HEIGHT, -SNAP_HEIGHT, 12, 12);
 			_controlPre.graphics.endFill();
 			_controlPre.graphics.lineStyle(1, 0x5083fc);
 			_controlPre.graphics.beginFill(0xFFFFFF);
@@ -76,7 +77,7 @@ package myproject
 
 			_controlPost = new Sprite();
 			_controlPost.graphics.beginFill(COLOR, 0);
-			_controlPost.graphics.drawRect(-6, -6, 12, 12);
+			_controlPost.graphics.drawRect(-SNAP_HEIGHT, -SNAP_HEIGHT, 12, 12);
 			_controlPost.graphics.endFill();
 			_controlPost.graphics.lineStyle(1, 0x5083fc);
 			_controlPost.graphics.beginFill(0xFFFFFF);
@@ -86,18 +87,18 @@ package myproject
 			if (pointPost)
 				addChild(_controlPost);
 
-			this.x = tx * (BezierGraph.GRAPH_RECT.width);
-			this.y = (1 - ty) * (BezierGraph.GRAPH_RECT.height);
+			this.x = tx * (BezierGraph.PERCENT_RECT.width);
+			this.y = (1 - ty) * (BezierGraph.PERCENT_RECT.height);
 
 			if (pointPre)
 			{
-				_controlPre.x = pointPre.x * (BezierGraph.GRAPH_RECT.width) - this.x;
-				_controlPre.y = (1 - pointPre.y) * (BezierGraph.GRAPH_RECT.height) - this.y;
+				_controlPre.x = pointPre.x * (BezierGraph.PERCENT_RECT.width) - this.x;
+				_controlPre.y = (1 - pointPre.y) * (BezierGraph.PERCENT_RECT.height) - this.y;
 			}
 			if (pointPost)
 			{
-				_controlPost.x = pointPost.x * (BezierGraph.GRAPH_RECT.width) - this.x;
-				_controlPost.y = (1 - pointPost.y) * (BezierGraph.GRAPH_RECT.height) - this.y;
+				_controlPost.x = pointPost.x * (BezierGraph.PERCENT_RECT.width) - this.x;
+				_controlPost.y = (1 - pointPost.y) * (BezierGraph.PERCENT_RECT.height) - this.y;
 			}
 
 			_main.addEventListener(MouseEvent.MOUSE_DOWN, _onMouseDown);
@@ -164,8 +165,8 @@ package myproject
 		public function get controlPointPreNormaled():Point
 		{
 			return new Point(
-				(this.x + _controlPre.x) / BezierGraph.GRAPH_RECT.width,
-				(BezierGraph.GRAPH_RECT.height - this.y - _controlPre.y) / BezierGraph.GRAPH_RECT.height);
+				(this.x + _controlPre.x) / BezierGraph.PERCENT_RECT.width,
+				(BezierGraph.PERCENT_RECT.height - this.y - _controlPre.y) / BezierGraph.PERCENT_RECT.height);
 		}
 
 		/**
@@ -176,8 +177,8 @@ package myproject
 		public function get controlPointPostNormaled():Point
 		{
 			return new Point(
-				(this.x + _controlPost.x) / BezierGraph.GRAPH_RECT.width,
-				(BezierGraph.GRAPH_RECT.height - this.y - _controlPost.y) / BezierGraph.GRAPH_RECT.height);
+				(this.x + _controlPost.x) / BezierGraph.PERCENT_RECT.width,
+				(BezierGraph.PERCENT_RECT.height - this.y - _controlPost.y) / BezierGraph.PERCENT_RECT.height);
 		}
 		private var _controlPre:Sprite;
 		private var _controlPost:Sprite;
@@ -202,29 +203,42 @@ package myproject
 		 */
 		public function toNormalPoint():Point
 		{
-			var xx:Number = (this.x) / BezierGraph.GRAPH_RECT.width;
-			var yy:Number = (BezierGraph.GRAPH_RECT.height - this.y) / BezierGraph.GRAPH_RECT.height;
+			var xx:Number = (this.x) / BezierGraph.PERCENT_RECT.width;
+			var yy:Number = (BezierGraph.PERCENT_RECT.height - this.y) / BezierGraph.PERCENT_RECT.height;
 
 			return new Point(xx, yy);
 		}
 
 		private function _onMouseDown(event:MouseEvent):void
 		{
+			var rect:Rectangle;
 			switch (event.currentTarget)
 			{
 				case _main:
 					if (lock)
 						return;
 					_currentDrag = this;
-					_currentDrag.startDrag(false, BezierGraph.instance.getDragbleRect(this));
+					_currentDrag.startDrag(true, BezierGraph.instance.getDragbleRect(this));
 					break;
 				case _controlPre:
 					_currentDrag = _controlPre;
-					_currentDrag.startDrag(false, new Rectangle(-this.x, -this.y, this.x, BezierGraph.GRAPH_RECT.height));
+					rect = new Rectangle(
+							-this.x, 
+							-this.y - BezierGraph.PERCENT_RECT.top, 
+							this.x, 
+							BezierGraph.GRAPH_RECT.height
+						);
+					_currentDrag.startDrag(true, rect);
 					break;
 				case _controlPost:
 					_currentDrag = _controlPost;
-					_currentDrag.startDrag(false, new Rectangle(0, -this.y, BezierGraph.GRAPH_RECT.width - this.x, BezierGraph.GRAPH_RECT.height));
+					rect = new Rectangle(
+						0, 
+						-this.y - BezierGraph.PERCENT_RECT.top, 
+						BezierGraph.GRAPH_RECT.width - this.x, 
+						BezierGraph.GRAPH_RECT.height
+					);
+					_currentDrag.startDrag(true, rect);
 					break;
 			}
 
@@ -234,6 +248,14 @@ package myproject
 
 		private function _onMouseMove(event:MouseEvent):void
 		{
+			if(_currentDrag == this)
+			{
+				if(Math.abs(this.y) < SNAP_HEIGHT)
+					this.y = 0;
+				if(Math.abs(this.y - BezierGraph.PERCENT_RECT.height) < SNAP_HEIGHT)
+					this.y = BezierGraph.PERCENT_RECT.height;
+			}
+			
 			graphics.clear();
 
 			_drawLine(_main, _controlPre);
@@ -247,6 +269,14 @@ package myproject
 		private function _onMouseUp(event:MouseEvent):void
 		{
 			_currentDrag.stopDrag();
+			
+			if(_currentDrag == this)
+			{
+				if(Math.abs(this.y) < SNAP_HEIGHT)
+					this.y = 0;
+				if(Math.abs(this.y - BezierGraph.PERCENT_RECT.height) < SNAP_HEIGHT)
+					this.y = BezierGraph.PERCENT_RECT.height;
+			}
 
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, _onMouseMove);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, _onMouseUp);
@@ -263,6 +293,7 @@ package myproject
 		public function updateControlPoint(mx:Number, my:Number):void
 		{
 			var rot:Number = Math.atan2(my-this.y, mx - this.x);
+			rot = Math.max(-Math.PI/2, Math.min(Math.PI/2, rot));
 			var t:Point = new Point(mx, my);
 			var me:Point = new Point(this.x, this.y);
 			

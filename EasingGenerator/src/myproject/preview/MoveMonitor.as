@@ -10,7 +10,7 @@ package myproject.preview
 
 	public class MoveMonitor extends Sprite implements IMonitor
 	{
-		public static const PREVIEW_RECT:Rectangle = new Rectangle(0, 20, 500, 50);
+		public static const PREVIEW_RECT:Rectangle = new Rectangle(0, 20, 400, 50);
 
 		/**
 		 * 新しい MoveMonitor インスタンスを作成します。
