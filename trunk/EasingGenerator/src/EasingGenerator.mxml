@@ -51,9 +51,17 @@
 			public function changeContainer():void
 			{
 				if (vs.selectedIndex == 1)
+				{
 					vs.selectedIndex = 0;
+					stage.frameRate = 60;
+				}
 				else
+				{
 					vs.selectedIndex = 1;
+					stage.frameRate = 5;
+					bezierGraph.stopPreview();
+					autoCb.selected = false;
+				}
 			}
 
 			protected function _onCreationComplete(event:FlexEvent):void
@@ -67,9 +75,13 @@
 			protected function autoCb_changeHandler(event:Event):void
 			{
 				if (autoCb.selected)
+				{
 					bezierGraph.playPreviewLoop();
+				}
 				else
+				{
 					bezierGraph.stopPreview();
+				}
 			}
 
 			protected function _onPlayBtnClick(event:MouseEvent):void
