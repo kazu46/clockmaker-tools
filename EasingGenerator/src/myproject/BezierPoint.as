@@ -21,7 +21,8 @@ package myproject
 	{
 		private static const COLOR:int = 0x0;
 		private static const RADIUS:int = 4;
-		private static const SNAP_HEIGHT:uint = 8;
+		private static const SNAP_HEIGHT:uint = 14;
+		private static const FIT_HEIGHT:uint = 4;
 
 
 		/**
@@ -37,17 +38,15 @@ package myproject
 		/**
 		 * 新しい BezierPoint インスタンスを作成します。
 		 */
-		public function BezierPoint(cx:Number, cy:Number, lock:Boolean, pointPre:Point, pointPost:Point):void
+		public function BezierPoint(main:Point, lock:Boolean, pointPre:Point, pointPost:Point):void
 		{
-			this.tx = cx;
-			this.ty = cy;
 			this.lock = lock;
 			this.pointPre = pointPre;
 			this.pointPost = pointPost;
 
 			_main = new Sprite();
 			_main.graphics.beginFill(COLOR, 0);
-			_main.graphics.drawRect(-SNAP_HEIGHT, -SNAP_HEIGHT, 12, 12);
+			_main.graphics.drawRect(-SNAP_HEIGHT/2, -SNAP_HEIGHT/2, SNAP_HEIGHT, SNAP_HEIGHT);
 			_main.graphics.endFill();
 			_main.graphics.beginFill(0x5083fc);
 			_main.graphics.drawRect(-RADIUS / 2 >> 0, -RADIUS / 2 >> 0, RADIUS, RADIUS);
@@ -65,7 +64,7 @@ package myproject
 
 			_controlPre = new Sprite();
 			_controlPre.graphics.beginFill(COLOR, 0);
-			_controlPre.graphics.drawRect(-SNAP_HEIGHT, -SNAP_HEIGHT, 12, 12);
+			_controlPre.graphics.drawRect(-SNAP_HEIGHT/2, -SNAP_HEIGHT/2, SNAP_HEIGHT, SNAP_HEIGHT);
 			_controlPre.graphics.endFill();
 			_controlPre.graphics.lineStyle(1, 0x5083fc);
 			_controlPre.graphics.beginFill(0xFFFFFF);
@@ -77,7 +76,7 @@ package myproject
 
 			_controlPost = new Sprite();
 			_controlPost.graphics.beginFill(COLOR, 0);
-			_controlPost.graphics.drawRect(-SNAP_HEIGHT, -SNAP_HEIGHT, 12, 12);
+			_controlPost.graphics.drawRect(-SNAP_HEIGHT/2, -SNAP_HEIGHT/2, SNAP_HEIGHT, SNAP_HEIGHT);
 			_controlPost.graphics.endFill();
 			_controlPost.graphics.lineStyle(1, 0x5083fc);
 			_controlPost.graphics.beginFill(0xFFFFFF);
@@ -87,8 +86,8 @@ package myproject
 			if (pointPost)
 				addChild(_controlPost);
 
-			this.x = tx * (BezierGraph.PERCENT_RECT.width);
-			this.y = (1 - ty) * (BezierGraph.PERCENT_RECT.height);
+			this.x = main.x * (BezierGraph.PERCENT_RECT.width);
+			this.y = (1 - main.y) * (BezierGraph.PERCENT_RECT.height);
 
 			if (pointPre)
 			{
@@ -244,15 +243,17 @@ package myproject
 
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, _onMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, _onMouseUp);
+			
+			event.stopPropagation();
 		}
 
 		private function _onMouseMove(event:MouseEvent):void
 		{
 			if(_currentDrag == this)
 			{
-				if(Math.abs(this.y) < SNAP_HEIGHT)
+				if(Math.abs(this.y) < FIT_HEIGHT)
 					this.y = 0;
-				if(Math.abs(this.y - BezierGraph.PERCENT_RECT.height) < SNAP_HEIGHT)
+				if(Math.abs(this.y - BezierGraph.PERCENT_RECT.height) < FIT_HEIGHT)
 					this.y = BezierGraph.PERCENT_RECT.height;
 			}
 			
@@ -272,9 +273,9 @@ package myproject
 			
 			if(_currentDrag == this)
 			{
-				if(Math.abs(this.y) < SNAP_HEIGHT)
+				if(Math.abs(this.y) < FIT_HEIGHT)
 					this.y = 0;
-				if(Math.abs(this.y - BezierGraph.PERCENT_RECT.height) < SNAP_HEIGHT)
+				if(Math.abs(this.y - BezierGraph.PERCENT_RECT.height) < FIT_HEIGHT)
 					this.y = BezierGraph.PERCENT_RECT.height;
 			}
 

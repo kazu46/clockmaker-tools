@@ -18,7 +18,9 @@
 
 	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
+			import spark.events.TextOperationEvent;
 			import spark.skins.spark.TitleWindowSkin;
 
 			[Bindable]
@@ -31,7 +33,6 @@
 		]]>
 	</fx:Script>
 
-	<s:Label text="Copied ActionScript Code"/>
 	<s:TextArea id="ta"
 				text="{code}"
 				editable="false"
