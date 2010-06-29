@@ -148,7 +148,7 @@
 			protected function _onTimeNsChange(event:Event):void
 			{
 				_bezierGraph.currentTime = timeNs.value;
-				_bezierGraph.updateTweens();
+				_bezierGraph.updateTweens(autoCb.selected);
 			}
 
 			private function _sliderDataTip(val:Number):String
@@ -259,7 +259,7 @@
 							value="4"
 							minimum="0.2"
 							maximum="8"
-							snapInterval="0.2"
+							snapInterval="0.1"
 							change="_onTimeNsChange(event)"
 							dataTipFormatFunction="_sliderDataTip"/>
 

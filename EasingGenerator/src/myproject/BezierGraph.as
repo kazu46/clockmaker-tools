@@ -227,9 +227,9 @@ package myproject
 		 * トゥイーンをリセットします。
 		 * @param time トゥイーンの秒数です。
 		 */
-		public function updateTweens():void
+		public function updateTweens(playFlag:Boolean):void
 		{
-			_updateEase();
+			_updateEase(playFlag);
 		}
 
 		public function getDragbleRect(target:BezierPoint):Rectangle
@@ -370,7 +370,7 @@ package myproject
 		/**
 		 * トゥイーンを作成
 		 */
-		private function _updateEase():void
+		private function _updateEase(playFlag:Boolean = true):void
 		{
 			// カスタムイージングを作成
 			var ease:IEasing = Custom.func(function(t:Number, b:Number, c:Number, d:Number):Number{
@@ -395,9 +395,9 @@ package myproject
 					return c * bezier.getYForX(t / d) + b;
 				});
 
-			_monitorMove.initTween(ease, currentTime);
-			_monitorScale.initTween(ease, currentTime);
-			_monitorRotate.initTween(ease, currentTime);
+			_monitorMove.initTween(ease, currentTime, playFlag);
+			_monitorScale.initTween(ease, currentTime, playFlag);
+			_monitorRotate.initTween(ease, currentTime, playFlag);
 		}
 		public var currentTime:Number = 4;
 

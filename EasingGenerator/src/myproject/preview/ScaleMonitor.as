@@ -50,13 +50,13 @@ package myproject.preview
 		/**
 		 * @inheritDoc
 		 */
-		public function initTween(ease:IEasing, time:Number):void
+		public function initTween(ease:IEasing, time:Number, playFlag:Boolean):void
 		{
 			if(_tween) _tween.stop();
 			// トゥイーンを作成
 			_tween = BetweenAS3.tween(_previewShape, {scaleX: 1, scaleY: 1}, {scaleX: 0, scaleY: 0}, time, ease);
 			_tween.stopOnComplete = false;
-			_tween.play();
+			if(playFlag) _tween.play();
 		}
 	}
 }
