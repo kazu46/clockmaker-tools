@@ -1,7 +1,14 @@
-    ];
+import flash.geom.Point;
+import fl.motion.BezierSegment;
+import com.greensock.TweenMax;
+
+// Custom Easing Function for TweenMax
+var ease:Function = function(t:Number, b:Number, c:Number, d:Number):Number{
+    var points:Array = [
+$$ease    ];
     var bezier:BezierSegment = null;
     for (var i:int = 0; i < points.length - 1; i++) {
-        if (t >= points[i].point[0] && t <= points[i+1].point[0]) {
+        if (t / d >= points[i].point[0] && t / d <= points[i+1].point[0]) {
             bezier = new BezierSegment(
                 new Point(points[i].point[0], points[i].point[1]),
                 new Point(points[i].post[0], points[i].post[1]),
@@ -10,8 +17,7 @@
             break;
         }
     }
-    return bezier.getYForX(t);
+    return c * bezier.getYForX(t / d) + b;
 };
-
 // Apply easing function such as...
-//KTween.to(target_mc, 4, {x:400}, ease);
+//TweenMax.to(target_mc, $$time, {x:400, ease:ease});

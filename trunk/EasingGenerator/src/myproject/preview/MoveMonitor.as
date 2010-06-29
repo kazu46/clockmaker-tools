@@ -1,9 +1,11 @@
 package myproject.preview
 {
 	import com.bit101.components.Label;
+	
 	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.geom.Rectangle;
+	
 	import org.libspark.betweenas3.BetweenAS3;
 	import org.libspark.betweenas3.core.easing.IEasing;
 	import org.libspark.betweenas3.tweens.ITween;
@@ -47,10 +49,11 @@ package myproject.preview
 		/**
 		 * @inheritDoc
 		 */
-		public function initTween(ease:IEasing):void
+		public function initTween(ease:IEasing, time:Number):void
 		{
+			if(_tween) _tween.stop();
 			// トゥイーンを作成
-			_tween = BetweenAS3.tween(_previewShape, {x: PREVIEW_RECT.right - _previewShape.width}, {x: PREVIEW_RECT.x}, 4, ease);
+			_tween = BetweenAS3.tween(_previewShape, {x: PREVIEW_RECT.right - _previewShape.width}, {x: PREVIEW_RECT.x}, time, ease);
 			_tween.stopOnComplete = false;
 			_tween.play();
 		}

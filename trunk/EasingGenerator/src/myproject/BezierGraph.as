@@ -222,6 +222,15 @@ package myproject
 			
 //			_debugDraw(preset.func);
 		}
+		
+		/**
+		 * トゥイーンをリセットします。
+		 * @param time トゥイーンの秒数です。
+		 */
+		public function updateTweens():void
+		{
+			_updateEase();
+		}
 
 		public function getDragbleRect(target:BezierPoint):Rectangle
 		{
@@ -238,24 +247,28 @@ package myproject
 
 		public function copy():String
 		{
-			var str:String = "";
+			var ease:String = "";
+			var str:String;
 
 			for (var i:int = 0; i < _controls.length; i++)
 			{
 				var c:BezierPoint = _controls[i];
-				str += '\t\t{point:[' + _digit(c.toNormalPoint().x) + ',' + _digit(c.toNormalPoint().y)
+				ease += '        {point:[' + _digit(c.toNormalPoint().x) + ',' + _digit(c.toNormalPoint().y)
 					+ '],pre:[' + _digit(c.controlPointPreNormaled.x) + ',' + _digit(c.controlPointPreNormaled.y)
 					+ '],post:[' + _digit(c.controlPointPostNormaled.x) + ',' + _digit(c.controlPointPostNormaled.y) + "]},\n"
 			}
 
 			if (engine == "Tweener")
-				str = new EmbedText.CODE_PRE_TWEENER + str + new EmbedText.CODE_POST_TWEENER;
+				str = new EmbedText.CODE_TWEENER;
 			else if (engine == "BetweenAS3")
-				str = new EmbedText.CODE_PRE_BETWEENAS3 + str + new EmbedText.CODE_POST_BETWEENAS3;
+				str = new EmbedText.CODE_BETWEENAS3;
 			else if (engine == "KTween")
-				str = new EmbedText.CODE_PRE_KTWEEN + str + new EmbedText.CODE_POST_KTWEEN;
+				str = new EmbedText.CODE_KTWEEN;
 			else if (engine == "TweenMax")
-				str = new EmbedText.CODE_PRE_TWEENMAX + str + new EmbedText.CODE_POST_TWEENMAX;
+				str = new EmbedText.CODE_TWEENMAX;
+			
+			str = str.split("$$ease").join(ease);
+			str = str.split("$$time").join(currentTime);
 
 			return str;
 		}
@@ -382,10 +395,11 @@ package myproject
 					return c * bezier.getYForX(t / d) + b;
 				});
 
-			_monitorMove.initTween(ease);
-			_monitorScale.initTween(ease);
-			_monitorRotate.initTween(ease);
+			_monitorMove.initTween(ease, currentTime);
+			_monitorScale.initTween(ease, currentTime);
+			_monitorRotate.initTween(ease, currentTime);
 		}
+		public var currentTime:Number = 4;
 
 		private function initUI():void
 		{
