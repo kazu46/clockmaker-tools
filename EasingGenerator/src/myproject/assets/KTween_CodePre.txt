@@ -1,7 +1,0 @@
-import flash.geom.Point;
-import fl.motion.BezierSegment;
-import net.kawa.tween.KTween;
-
-// Custom Easing Function for KTween
-var ease:Function = function(t:Number):Number {
-    var points:Array = [

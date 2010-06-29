@@ -1,4 +1,11 @@
-    ];
+import flash.geom.Point;
+import fl.motion.BezierSegment;
+import caurina.transitions.Tweener;
+
+// Custom Easing Function for Tweener
+var ease:Function = function(t:Number, b:Number, c:Number, d:Number, p_params:Object = null):Number{
+    var points:Array = [
+$$ease    ];
     var bezier:BezierSegment = null;
     for (var i:int = 0; i < points.length - 1; i++) {
         if (t / d >= points[i].point[0] && t / d <= points[i+1].point[0]) {
@@ -14,9 +21,4 @@
 };
 
 // Apply easing function such as...
-/*
-Tweener.addTween(target_mc, {
-    x          : 400, 
-    time       : 4, 
-    transition : ease });
-*/
+//Tweener.addTween(target_mc, {x : 400, time : $$time, transition : ease });

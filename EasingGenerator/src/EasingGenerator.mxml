@@ -82,6 +82,7 @@
 				instance = this;
 
 				_bezierGraph = new BezierGraph();
+				_bezierGraph.currentTime = timeNs.value;
 				canvas.addChild(_bezierGraph);
 			}
 
@@ -143,6 +144,20 @@
 					: "http://clockmaker.jp/blog-en/";
 				navigateToURL(new URLRequest(url), "_blank");
 			}
+
+			protected function _onTimeNsChange(event:Event):void
+			{
+				_bezierGraph.currentTime = timeNs.value;
+				_bezierGraph.updateTweens();
+			}
+
+			private function _sliderDataTip(val:Number):String
+			{
+				var str:String = (Math.round(val * 10) / 10).toString(10);
+				if (str.length == 1)
+					str += ".0";
+				return str + " sec";
+			}
 		]]>
 	</fx:Script>
 	<s:layout>
@@ -181,7 +196,7 @@
 						  toolTip="More Info from Developer Blog"
 						  click="_onMoreInfoBtnClick(event)"/>
 				<s:Button x="622"
-						  y="273"
+						  y="238"
 						  width="100"
 						  height="18"
 						  label="Reset"
@@ -225,15 +240,28 @@
 							   label="TweenMax"
 							   group="{tweenEngine}"/>
 				<s:ComboBox x="621"
-							y="237"
+							y="207"
 							width="100"
 							dataProvider="{Preset.presetAC}"
 							selectedIndex="0"
 							id="presetCb"
 							change="presetCb_changeHandler(event)"/>
 				<s:Label x="622"
-						 y="218"
+						 y="188"
 						 text="Preset"/>
+				<s:Label x="622"
+						 y="274"
+						 text="{'Time : ' + timeNs.value + ' sec'}"/>
+				<mx:HSlider id="timeNs"
+							x="622"
+							y="292"
+							width="100"
+							value="4"
+							minimum="0.2"
+							maximum="8"
+							snapInterval="0.2"
+							change="_onTimeNsChange(event)"
+							dataTipFormatFunction="_sliderDataTip"/>
 
 			</s:BorderContainer>
 		</s:NavigatorContent>

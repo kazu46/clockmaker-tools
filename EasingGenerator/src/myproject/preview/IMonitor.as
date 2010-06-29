@@ -20,8 +20,9 @@ package myproject.preview
 		/**
 		 * トゥイーンを初期化します。
 		 * @param ease イージング関数
+		 * @param time 時間(秒)
 		 * 
 		 */
-		function initTween(ease:IEasing):void;
+		function initTween(ease:IEasing, time:Number):void;
 	}
 }
