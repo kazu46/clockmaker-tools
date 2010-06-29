@@ -21,8 +21,8 @@ package myproject.preview
 		 * トゥイーンを初期化します。
 		 * @param ease イージング関数
 		 * @param time 時間(秒)
-		 * 
+		 * @param playFlag 自動再生させるかどうかの指定
 		 */
-		function initTween(ease:IEasing, time:Number):void;
+		function initTween(ease:IEasing, time:Number, playFlag:Boolean):void;
 	}
 }

@@ -24,7 +24,13 @@ package myproject.preview
 			graphics.lineStyle(1, 0xB3B3B3);
 			graphics.beginFill(0xE6E6E6);
 			graphics.drawRect(PREVIEW_RECT.x, PREVIEW_RECT.y, PREVIEW_RECT.width, PREVIEW_RECT.height);
+			graphics.endFill();
 
+			graphics.lineStyle();
+			graphics.beginFill(0xCCCCCC);
+			graphics.drawCircle(PREVIEW_RECT.left + 24 + 1, PREVIEW_RECT.top + 24 + 2, 24);
+			graphics.drawCircle(PREVIEW_RECT.right - 24 - 1, PREVIEW_RECT.top + 24 + 2, 24);
+			
 			_previewShape = new Shape();
 			_previewShape.graphics.beginFill(0x555555)
 			_previewShape.graphics.drawCircle(24, 24, 24);
@@ -49,13 +55,13 @@ package myproject.preview
 		/**
 		 * @inheritDoc
 		 */
-		public function initTween(ease:IEasing, time:Number):void
+		public function initTween(ease:IEasing, time:Number, playFlag:Boolean):void
 		{
 			if(_tween) _tween.stop();
 			// トゥイーンを作成
 			_tween = BetweenAS3.tween(_previewShape, {x: PREVIEW_RECT.right - _previewShape.width}, {x: PREVIEW_RECT.x}, time, ease);
 			_tween.stopOnComplete = false;
-			_tween.play();
+			if(playFlag) _tween.play();
 		}
 	}
 }
