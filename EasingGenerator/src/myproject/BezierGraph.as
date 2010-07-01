@@ -1,9 +1,6 @@
 package myproject
 {
 	import com.bit101.components.Label;
-	
-	import fl.motion.BezierSegment;
-	
 	import flash.desktop.Clipboard;
 	import flash.desktop.ClipboardFormats;
 	import flash.display.Shape;
@@ -13,9 +10,8 @@ package myproject
 	import flash.filters.DropShadowFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-	
 	import mx.managers.PopUpManager;
-	
+	import fl.motion.BezierSegment;
 	import myproject.assets.EmbedText;
 	import myproject.data.Preset;
 	import myproject.data.PresetData;
@@ -23,7 +19,6 @@ package myproject
 	import myproject.preview.RotateMonitor;
 	import myproject.preview.ScaleMonitor;
 	import myproject.ui.AlertWindow;
-	
 	import org.libspark.betweenas3.core.easing.IEasing;
 	import org.libspark.betweenas3.easing.Custom;
 
@@ -81,13 +76,12 @@ package myproject
 			_debugCanvas.x = GRAPH_RECT.left + PERCENT_RECT.left;
 			_debugCanvas.y = GRAPH_RECT.top;
 			addChild(_debugCanvas);
-			
+
 			_curveCanvas = new Shape();
 			_curveCanvas.x = GRAPH_RECT.left + PERCENT_RECT.left;
 			_curveCanvas.y = GRAPH_RECT.top + PERCENT_RECT.top;
 			addChild(_curveCanvas);
 			_curveCanvas.filters = [new DropShadowFilter(1, 90, 0, 0.4, 0, 2)];
-			
 
 			_clickCanvas = new Sprite();
 			_clickCanvas.x = GRAPH_RECT.left + PERCENT_RECT.left;
@@ -111,6 +105,18 @@ package myproject
 
 		public var engine:String = "Tweener";
 
+		public function get currentTime():Number
+		{
+			return _currentTime;
+		}
+
+		public function set currentTime(value:Number):void
+		{
+			_currentTime = value;
+			_updateTimeLabel();
+		}
+		private var _currentTime:Number = 4;
+
 		private var _clickCanvas:Sprite;
 		private var _container:Sprite = new Sprite();
 		private var _canvas:Sprite = new Sprite();
@@ -123,6 +129,8 @@ package myproject
 		private var _monitorScale:ScaleMonitor;
 		private var _monitorRotate:RotateMonitor;
 		private var _currentPoint:BezierPoint;
+		private var _timeLabel:*;
+		private var _timeLabels:Vector.<Label>;
 
 		/**
 		 * プレビューを停止します。
@@ -217,12 +225,11 @@ package myproject
 				_controlCanvas.addChild(_controls[i]);
 			}
 
-
 			_update(null);
-			
+
 //			_debugDraw(preset.func);
 		}
-		
+
 		/**
 		 * トゥイーンをリセットします。
 		 * @param time トゥイーンの秒数です。
@@ -266,7 +273,7 @@ package myproject
 				str = new EmbedText.CODE_KTWEEN;
 			else if (engine == "TweenMax")
 				str = new EmbedText.CODE_TWEENMAX;
-			
+
 			str = str.split("$$ease").join(ease);
 			str = str.split("$$time").join(currentTime);
 
@@ -399,13 +406,25 @@ package myproject
 			_monitorScale.initTween(ease, currentTime, playFlag);
 			_monitorRotate.initTween(ease, currentTime, playFlag);
 		}
-		public var currentTime:Number = 4;
 
 		private function initUI():void
 		{
 			var l:Label = new Label(this, 8, 190, "TWEEN");
 			l.rotation = -90;
-			new Label(this, 295, 360, "TIME (0.0 - 1.0)");
+			_timeLabel = new Label(this, 295, 360, "TIME (SEC)");
+			_updateTimeLabel();
+		}
+
+		private function _updateTimeLabel():void
+		{
+			var displayTime:String;
+
+			for (var i:int = 0; i < _timeLabels.length; i++)
+			{
+				displayTime = (Math.round((currentTime / (_timeLabels.length + 1)) * (i + 1) * 10) / 10).toString();
+				displayTime += displayTime.length == 1 ? ".0" : "";
+				_timeLabels[i].text = displayTime;
+			}
 		}
 
 		private function drawLine(p0:Point, p1:Point, color:uint = 0x000000):void
@@ -423,6 +442,9 @@ package myproject
 			_division.graphics.endFill();
 
 			_division.graphics.lineStyle(1, 0xB3B3B3);
+
+			_timeLabels = new Vector.<Label>();
+
 			for (var i:int = 0; i <= GRAPH_RECT.width; i++)
 			{
 				if (i % GRAPH_STEP_W == 0)
@@ -433,7 +455,9 @@ package myproject
 				if (i != 0 && i % Math.round(GRAPH_RECT.width / 10) == 0)
 				{
 					var num:Number = Math.floor(i / GRAPH_RECT.width * 10) / 10;
-					new Label(_container, i + GRAPH_RECT.left - 10, GRAPH_RECT.bottom - 20, num.toString(10));
+					_timeLabels.push(
+						new Label(_container, i + GRAPH_RECT.left - 10, GRAPH_RECT.bottom - 20, num.toString(10))
+						);
 				}
 			}
 			for (var j:int = 0; j <= GRAPH_RECT.height; j++)
