@@ -3,7 +3,7 @@
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   showStatusBar="false"
-					   frameRate="60"
+					   frameRate="30"
 					   creationComplete="_onCreationComplete(event)"
 					   xmlns:local="*"
 					   xmlns:myproject="myproject.*"
@@ -151,6 +151,11 @@
 				_bezierGraph.updateTweens(autoCb.selected);
 			}
 
+			protected function _onFpsNsChange(event:Event):void
+			{
+				stage.frameRate = fpsNs.value;
+			}
+
 			private function _sliderDataTip(val:Number):String
 			{
 				var str:String = (Math.round(val * 10) / 10).toString(10);
@@ -251,17 +256,30 @@
 						 text="Preset"/>
 				<s:Label x="622"
 						 y="274"
-						 text="{'Time : ' + timeNs.value + ' sec'}"/>
-				<mx:HSlider id="timeNs"
-							x="622"
-							y="292"
-							width="100"
-							value="4"
-							minimum="0.2"
-							maximum="8"
-							snapInterval="0.1"
-							change="_onTimeNsChange(event)"
-							dataTipFormatFunction="_sliderDataTip"/>
+						 text="Time :"
+						 verticalAlign="top"/>
+				<ui:DraggableTextInput x="660"
+									   y="268"
+									   id="timeNs"
+									   minimum="0.2"
+									   maximum="20"
+									   value="4"
+									   snapInterval="0.1"
+									   liveDragging="false"
+									   change="_onTimeNsChange(event)"/>
+				<s:Label x="622"
+						 y="300"
+						 text="FPS  :"
+						 verticalAlign="top"/>
+				<ui:DraggableTextInput x="660"
+									   y="294"
+									   id="fpsNs"
+									   minimum="5"
+									   maximum="60"
+									   value="30"
+									   snapInterval="1"
+									   liveDragging="false"
+									   change="_onFpsNsChange(event)"/>
 
 			</s:BorderContainer>
 		</s:NavigatorContent>
