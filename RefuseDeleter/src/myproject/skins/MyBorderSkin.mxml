@@ -20,11 +20,17 @@
 	
 	<s:Rect left="0" right="0" top="0" bottom="0">
 		<s:fill>
-			<s:SolidColor color="0x6e6e6e" />
+			<s:SolidColor color="0xFFFFFF" />
 		</s:fill>
 	</s:Rect>
 	
 	<s:Rect left="1" right="1" top="1" bottom="1">
+		<s:fill>
+			<s:SolidColor color="0x6e6e6e" />
+		</s:fill>
+	</s:Rect>
+	
+	<s:Rect left="2" right="2" top="2" bottom="2">
 		<s:fill>
 			<s:SolidColor color="0xDDDDDD" />
 		</s:fill>

@@ -3,7 +3,8 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark"
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   title="検索中..."
-			   close="onClick()">
+			   width="300"
+			   close="clickHandler()">
 	<s:layout>
 		<s:VerticalLayout horizontalAlign="center"
 						  paddingTop="20"
@@ -16,7 +17,7 @@
 		<![CDATA[
 			public var path:RefuseDeleter;
 
-			protected function onClick():void
+			protected function clickHandler():void
 			{
 				path.interruptSearch();
 			}
@@ -24,7 +25,9 @@
 	</fx:Script>
 
 	<mx:ProgressBar id="progress"
-					indeterminate="true"/>
-	<s:Button label="キャンセル"
-			  click="onClick()"/>
+					label="検索中"
+					indeterminate="true"
+					width="100%"/>
+	<mx:Button label="キャンセル"
+			   click="clickHandler()"/>
 </s:TitleWindow>
