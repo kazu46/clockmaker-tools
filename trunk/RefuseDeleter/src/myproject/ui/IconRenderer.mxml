@@ -17,6 +17,8 @@
 
 			[Embed(source="/assets/icon_ds.png")]
 			private static const ICON_DS:Class;
+			[Embed(source="/assets/icon_ini.png")]
+			private static const ICON_INI:Class;
 			[Embed(source="/assets/icon_notes.png")]
 			private static const ICON_NOTES:Class;
 			[Embed(source="/assets/icon_svn.png")]
@@ -37,6 +39,10 @@
 				else if (file.name == FileName.DOT_BRIDGE_SORT)
 				{
 					img.source = ICON_BR;
+				}
+				else if (file.name.toLowerCase() == FileName.DESKTOP_DOT_INI.toLowerCase())
+				{
+					img.source = ICON_INI;
 				}
 				else if (file.name == FolderName._NOTES)
 				{

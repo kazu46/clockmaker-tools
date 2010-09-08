@@ -12,7 +12,7 @@
 	<name>カス削除くん</name>
 
 	<!-- An application version designator (such as "v1", "2.5", or "Alpha 1"). Required. -->
-	<version>0.3.0</version>
+	<version>0.3.1</version>
 
 	<!-- Description, displayed in the AIR application installer.
 	     May have multiple values for each language. See samples or xsd schema file. Optional. -->
@@ -55,7 +55,7 @@
 		<width>640</width>
 
 		<!-- The window's initial height. Optional. -->
-		<height>430</height>
+		<height>500</height>
 
 		<!-- The window's initial x position. Optional. -->
 		<!-- <x></x> -->
@@ -64,7 +64,7 @@
 		<!-- <y></y> -->
 
 		<!-- The window's minimum size, specified as a width/height pair, such as "400 200". Optional. -->
-		<minSize>640 440</minSize>
+		<minSize>640 500</minSize>
 
 		<!-- The window's initial maximum size, specified as a width/height pair, such as "1600 1200". Optional. -->
 		<!-- <maxSize></maxSize> -->
