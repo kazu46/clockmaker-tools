@@ -33,6 +33,13 @@
 		}
 	</fx:Style>
 
+	<fx:Declarations>
+		<s:HTTPService url="app:/RefuseDeleter-app.xml"
+					   id="appXmlLoader"
+					   resultFormat="e4x"
+					   fault="appXmlLoader_faultHandler(event)"
+					   result="appXmlLoader_resultHandler(event)"/>
+	</fx:Declarations>
 
 	<fx:Script>
 		<![CDATA[
@@ -47,6 +54,8 @@
 			import mx.events.FlexEvent;
 			import mx.events.ListEvent;
 			import mx.managers.PopUpManager;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
 			
 			import myproject.data.FileName;
 			import myproject.data.FolderName;
@@ -94,6 +103,8 @@
 				_progressPanel.path = this;
 
 				resumeSharedObject();
+
+				appXmlLoader.send();
 			}
 
 			protected function preinitializeHandler(event:FlexEvent):void
@@ -158,7 +169,7 @@
 						PopUpManager.centerPopUp(_progressPanel);
 					},
 					// 検索開始
-					new Func(searchCore, [_dir]),
+					new Func(searchCore, [ _dir ]),
 					// 終了処理
 					function():void{
 						_fileArrCl.source = _fileArr;
@@ -177,14 +188,18 @@
 			{
 				if (!target)
 					return;
-				
+
 				var isDirectory:Boolean;
 				var fileName:String;
-				
-				try{
+
+				try
+				{
 					isDirectory = target.isDirectory;
 					fileName = target.name;
-				}catch(e:Error){}
+				}
+				catch (e:Error)
+				{
+				}
 
 				if (isDirectory)
 				{
@@ -193,6 +208,10 @@
 						_fileArr.push(target);
 					}
 					else if (_cbDreamWeaver.selected && fileName == FolderName._NOTES)
+					{
+						_fileArr.push(target);
+					}
+					else if (_cbMACOSX.selected && fileName == FolderName.__MACOSX)
 					{
 						_fileArr.push(target);
 					}
@@ -213,7 +232,7 @@
 
 								// コマンドを追加(再帰処理)
 								_cmd.insertCommand(
-									new Func(searchCore, [element])
+									new Func(searchCore, [ element ])
 									);
 
 								// ASYNC_RESUME_COUNT 回ごとに1回休憩する(フレームを進ませる)
@@ -232,17 +251,21 @@
 					{
 						_fileArr.push(target);
 					}
-					if (_cbThumb.selected && fileName == FileName.THUMBS_DB)
+					else if (_cbThumb.selected && fileName == FileName.THUMBS_DB)
 					{
 						_fileArr.push(target);
 					}
-					if (_cbThumb.selected && fileName == FileName.DOT_BRIDGE_SORT)
+					else if (_cbThumb.selected && fileName == FileName.DOT_BRIDGE_SORT)
+					{
+						_fileArr.push(target);
+					}
+					else if (_cbDesktopIni.selected && fileName.toLowerCase() == FileName.DESKTOP_DOT_INI.toLowerCase())
 					{
 						_fileArr.push(target);
 					}
 				}
 
-				_progressPanel.progress.label = "検索中(現在" + _seachCount + "項目 / 全" + _seachTotal + "項目)";
+				_progressPanel.progress.label = "検索中(" + _seachCount + "項目)";
 				_seachCount++;
 			}
 
@@ -295,9 +318,9 @@
 				searchFiles();
 			}
 
-			protected function alert_closeHandler(e:CloseEvent):void
+			protected function alert_closeHandler(event:CloseEvent):void
 			{
-				if (e.detail == Alert.YES)
+				if (event.detail == Alert.YES)
 				{
 					for (var i:int = 0; i < _fileArr.length; i++)
 					{
@@ -325,7 +348,9 @@
 						_cbSVN: _cbSVN.selected,
 						_cbDreamWeaver: _cbDreamWeaver.selected,
 						_cbBridge: _cbBridge.selected,
-						_cbChild: _cbChild.selected
+						_cbChild: _cbChild.selected,
+						_cbDesktopIni: _cbDesktopIni.selected,
+						_cbMACOSX: _cbMACOSX.selected
 					};
 				so.flush();
 			}
@@ -341,6 +366,8 @@
 					_cbDreamWeaver.selected = so.data.config._cbDreamWeaver;
 					_cbBridge.selected = so.data.config._cbBridge;
 					_cbChild.selected = so.data.config._cbChild;
+					_cbDesktopIni.selected = so.data.config._cbDesktopIni;
+					_cbMACOSX.selected = so.data.config._cbMACOSX;
 				}
 			}
 
@@ -355,10 +382,31 @@
 				navigateToURL(new URLRequest("http://code.google.com/p/clockmaker-tools/"));
 			}
 
+			protected function appXmlLoader_resultHandler(event:ResultEvent):void
+			{
+				var message:XML = XML(appXmlLoader.lastResult);
+
+				var atom:Namespace = new Namespace("http://ns.adobe.com/air/application/2.0");
+				versionLabel.text = "Version " + message.atom::version;
+			}
+
 			private function onExiting(event:Event):void
 			{
 				suspendSharedObject();
+			}
+
+			private function fileNameSortCompareFunction(obj1:Object, obj2:Object):Number
+			{
+				var file1:File = obj1 as File;
+				var file2:File = obj2 as File;
+				return file1.name > file2.name ? 1 : -1;
 			};
+
+			protected function appXmlLoader_faultHandler(event:FaultEvent):void
+			{
+				// TODO Auto-generated method stub
+			}
+
 		]]>
 	</fx:Script>
 
@@ -391,12 +439,12 @@
 				   icon="@Embed(source='/assets/cross.png')"/>
 
 		<mx:Spacer width="100%"/>
-		<s:Label text="Version 0.3.0"
+		<s:Label id="versionLabel"
+				 text="Version"
 				 click="version_clickHandler(event)"
 				 buttonMode="true"
 				 toolTip="開発者のサイトを開きます"
-				 fontSize="9"
-				 />
+				 fontSize="9"/>
 	</s:Group>
 
 	<mx:HRule width="100%"/>
@@ -405,7 +453,7 @@
 			  height="100%"
 			  paddingLeft="15"
 			  paddingRight="15"
-			  gap="10">
+			  gap="3">
 
 		<s:VGroup width="100%"
 				  height="100%">
@@ -426,25 +474,28 @@
 
 			<s:Label text="{'見つかったカスファイル (' + _fileNum + '項目)'}"/>
 
-			<mx:DataGrid id="_listFile"
-						 width="100%"
-						 height="100%"
-						 dataProvider="{_fileArrCl}"
-						 doubleClickEnabled="true"
-						 itemDoubleClick="_listFile_itemDoubleClickHandler(event)">
-				<mx:columns>
-					<mx:DataGridColumn headerText="ファイル"
-									   width="100"
-									   itemRenderer="myproject.ui.IconRenderer"/>
-					<mx:DataGridColumn headerText="フルパス"
-									   dataField="nativePath"/>
-				</mx:columns>
-			</mx:DataGrid>
-
+			<s:BorderContainer width="100%"
+							   height="100%"
+							   borderColor="0xFFFFFF">
+				<mx:DataGrid id="_listFile"
+							 width="100%"
+							 height="100%"
+							 dataProvider="{_fileArrCl}"
+							 doubleClickEnabled="true"
+							 itemDoubleClick="_listFile_itemDoubleClickHandler(event)">
+					<mx:columns>
+						<mx:DataGridColumn headerText="ファイル"
+										   width="100"
+										   itemRenderer="myproject.ui.IconRenderer"
+										   sortCompareFunction="{fileNameSortCompareFunction}"/>
+						<mx:DataGridColumn headerText="フルパス"
+										   dataField="nativePath"/>
+					</mx:columns>
+				</mx:DataGrid>
+			</s:BorderContainer>
 		</s:VGroup>
 
-		<s:VGroup 
-				  width="180"
+		<s:VGroup width="180"
 				  height="100%">
 
 			<s:HGroup>
@@ -452,61 +503,85 @@
 				<s:Label text="検索対象"/>
 			</s:HGroup>
 
-			<s:BorderContainer width="100%"
+			<s:BorderContainer  width="100%"
 							   height="100%"
 							   skinClass="myproject.skins.MyBorderSkin">
-				<s:layout>
-					<s:VerticalLayout paddingBottom="10"
-									  paddingLeft="10"
-									  paddingRight="10"
-									  paddingTop="10"
-									  gap="6"/>
-				</s:layout>
-				<s:Label text="OS 関連"
-						 fontWeight="bold"/>
-				<s:VGroup>
-					<mx:CheckBox id="_cbThumb"
-								 label="Thumb.db"
-								 selected="true"/>
-					<mx:CheckBox id="_cbDSStore"
-								 label=".DS_Store"
-								 selected="true"/>
-				</s:VGroup>
 
-				<mx:HRule width="160"/>
-				<s:Label text="バージョン管理システム関連"
-						 fontWeight="bold"/>
-				<s:VGroup>
-					<mx:CheckBox id="_cbSVN"
-								 label=".svn フォルダ"
-								 selected="false"/>
-				</s:VGroup>
+				<s:Scroller width="100%"
+							height="100%"
+							horizontalScrollPolicy="off">
 
-				<mx:HRule width="100%"/>
-				<s:Label text="Creative Suite 関連"
-						 fontWeight="bold"/>
-				<s:VGroup>
-					<mx:CheckBox id="_cbBridge"
-								 label=".BridgeSort"
-								 selected="false"/>
-					<mx:CheckBox id="_cbDreamWeaver"
-								 label="_notes フォルダ"
-								 selected="false"/>
-				</s:VGroup>
+					<s:Group width="100%"
+							 height="100%"
+							 >
+						<s:layout>
+							<s:VerticalLayout paddingBottom="10"
+											  paddingLeft="10"
+											  paddingRight="10"
+											  paddingTop="10"
+											  gap="10"/>
+						</s:layout>
 
-				<mx:HRule width="100%"/>
-				<s:Label text="オプション"
-						 fontWeight="bold"/>
-				<s:VGroup>
-					<mx:CheckBox id="_cbChild"
-								 label="サブフォルダも含める"
-								 selected="true"/>
-				</s:VGroup>
+						<s:Label text="オプション"
+								 fontWeight="bold"/>
+						<s:VGroup>
+							<mx:CheckBox id="_cbChild"
+										 label="サブフォルダも含める"
+										 selected="true"/>
+						</s:VGroup>
+
+						<mx:HRule width="100%"/>
+
+						<s:Label text="OS 関連"
+								 fontWeight="bold"/>
+						<s:VGroup>
+							<mx:CheckBox id="_cbThumb"
+										 label="{FileName.THUMBS_DB}"
+										 selected="true"
+										 toolTip="Windows のカスファイルです。"/>
+							<mx:CheckBox id="_cbDesktopIni"
+										 label="{FileName.DESKTOP_DOT_INI}"
+										 selected="true"
+										 toolTip="Windows のカスファイルです。"/>
+							<mx:CheckBox id="_cbDSStore"
+										 label="{FileName.DOT_DS_STORE}"
+										 selected="true"
+										 toolTip="Mac OS X のカスファイルです。"/>
+							<mx:CheckBox id="_cbMACOSX"
+										 label="{FolderName.__MACOSX}"
+										 selected="true"
+										 toolTip="Mac OS X のカスフォルダです。"/>
+						</s:VGroup>
+
+						<mx:HRule width="160"/>
+						<s:Label text="バージョン管理システム関連"
+								 fontWeight="bold"/>
+						<s:VGroup>
+							<mx:CheckBox id="_cbSVN"
+										 label=".svn フォルダ"
+										 selected="false"
+										 toolTip="Subversion のカスフォルダです。"/>
+						</s:VGroup>
+
+						<mx:HRule width="100%"/>
+						<s:Label text="Creative Suite 関連"
+								 fontWeight="bold"/>
+						<s:VGroup>
+							<mx:CheckBox id="_cbBridge"
+										 label=".BridgeSort"
+										 selected="false"
+										 toolTip="Adobe Bridge のカスファイルです。"/>
+							<mx:CheckBox id="_cbDreamWeaver"
+										 label="_notes フォルダ"
+										 selected="false"
+										 toolTip="Adobe Dreamweaver のカスフォルダです。"/>
+						</s:VGroup>
+					</s:Group>
+				</s:Scroller>
 			</s:BorderContainer>
 
 		</s:VGroup>
 
 	</s:HGroup>
-
 
 </s:WindowedApplication>
