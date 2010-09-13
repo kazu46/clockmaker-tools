@@ -33,13 +33,6 @@
 		}
 	</fx:Style>
 
-	<fx:Declarations>
-		<s:HTTPService url="app:/RefuseDeleter-app.xml"
-					   id="appXmlLoader"
-					   resultFormat="e4x"
-					   fault="appXmlLoader_faultHandler(event)"
-					   result="appXmlLoader_resultHandler(event)"/>
-	</fx:Declarations>
 
 	<fx:Script>
 		<![CDATA[
@@ -103,8 +96,10 @@
 				_progressPanel.path = this;
 
 				resumeSharedObject();
-
-				appXmlLoader.send();
+				
+				var message:XML = this.nativeApplication.applicationDescriptor;
+				var atom:Namespace = new Namespace("http://ns.adobe.com/air/application/2.0");
+				versionLabel.text = "Version " + message.atom::version;
 			}
 
 			protected function preinitializeHandler(event:FlexEvent):void
@@ -287,17 +282,32 @@
 				searchPreparation(_dir = list[0]);
 			}
 
-			protected function onBrowseBtnClick():void
+			protected function selectButton_clickHandler():void
 			{
 				_dir = new File();
-				_dir.addEventListener(Event.SELECT, onFileBrowseSelect, false, 0, true);
+				_dir.addEventListener(Event.SELECT, dir_selectHandler);
+				_dir.addEventListener(Event.CANCEL, dir_cancelHandler);
 				_dir.browseForDirectory("フォルダを選択");
 			}
 
-			protected function onFileBrowseSelect(event:Event):void
+			protected function dir_cancelHandler(event:Event):void
 			{
+				destroyDirEvents();
+				_dir = null;
+			}
+
+			protected function dir_selectHandler(event:Event):void
+			{
+				destroyDirEvents();
 				searchPreparation(event.target as File);
 			}
+			
+			protected function destroyDirEvents():void
+			{
+				_dir.removeEventListener(Event.SELECT, dir_selectHandler);
+				_dir.removeEventListener(Event.CANCEL, dir_cancelHandler);
+			}
+			
 
 			protected function deleteButton_clickHandler(event:MouseEvent):void
 			{
@@ -382,13 +392,6 @@
 				navigateToURL(new URLRequest("http://code.google.com/p/clockmaker-tools/"));
 			}
 
-			protected function appXmlLoader_resultHandler(event:ResultEvent):void
-			{
-				var message:XML = XML(appXmlLoader.lastResult);
-
-				var atom:Namespace = new Namespace("http://ns.adobe.com/air/application/2.0");
-				versionLabel.text = "Version " + message.atom::version;
-			}
 
 			private function onExiting(event:Event):void
 			{
@@ -401,12 +404,6 @@
 				var file2:File = obj2 as File;
 				return file1.name > file2.name ? 1 : -1;
 			};
-
-			protected function appXmlLoader_faultHandler(event:FaultEvent):void
-			{
-				// TODO Auto-generated method stub
-			}
-
 		]]>
 	</fx:Script>
 
@@ -425,7 +422,7 @@
 		</s:layout>
 
 		<mx:Button label="フォルダを選択する"
-				   click="onBrowseBtnClick()"
+				   click="selectButton_clickHandler()"
 				   width="180"
 				   height="30"
 				   toolTip="もしくはフォルダをドラッグ＆ドロップしてください"
@@ -503,83 +500,87 @@
 				<s:Label text="検索対象"/>
 			</s:HGroup>
 
-			<s:BorderContainer  width="100%"
-							   height="100%"
-							   skinClass="myproject.skins.MyBorderSkin">
+			<mx:VBox paddingBottom="10"
+					 paddingLeft="10"
+					 paddingRight="10"
+					 paddingTop="10"
+					 verticalGap="10"
+					 verticalScrollPolicy="auto"
+					 horizontalScrollPolicy="off"
+					 height="100%"
+					 width="100%"
+					 backgroundColor="0xDDDDDD"
+					 borderStyle="inset"
+					 borderColor="0x6e6e6e"
+					 minHeight="320">
 
-				<s:Scroller width="100%"
-							height="100%"
-							horizontalScrollPolicy="off">
+				<s:Label text="オプション"
+						 fontWeight="bold"/>
+				<s:VGroup>
+					<mx:CheckBox id="_cbChild"
+								 label="サブフォルダも含める"
+								 selected="true"/>
+				</s:VGroup>
 
-					<s:Group width="100%"
-							 height="100%"
-							 >
-						<s:layout>
-							<s:VerticalLayout paddingBottom="10"
-											  paddingLeft="10"
-											  paddingRight="10"
-											  paddingTop="10"
-											  gap="10"/>
-						</s:layout>
+				<mx:HRule width="100%"/>
 
-						<s:Label text="オプション"
-								 fontWeight="bold"/>
-						<s:VGroup>
-							<mx:CheckBox id="_cbChild"
-										 label="サブフォルダも含める"
-										 selected="true"/>
-						</s:VGroup>
+				<s:Label text="Windows 関連"
+						 fontWeight="bold"/>
+				<s:VGroup>
+					<mx:CheckBox id="_cbThumb"
+								 label="{FileName.THUMBS_DB}"
+								 selected="true"
+								 toolTip="Windows のカスファイルです。"/>
+					<mx:CheckBox id="_cbDesktopIni"
+								 label="{FileName.DESKTOP_DOT_INI}"
+								 selected="true"
+								 toolTip="Windows のカスファイルです。"/>
+				</s:VGroup>
 
-						<mx:HRule width="100%"/>
+				<mx:HRule width="100%"/>
 
-						<s:Label text="OS 関連"
-								 fontWeight="bold"/>
-						<s:VGroup>
-							<mx:CheckBox id="_cbThumb"
-										 label="{FileName.THUMBS_DB}"
-										 selected="true"
-										 toolTip="Windows のカスファイルです。"/>
-							<mx:CheckBox id="_cbDesktopIni"
-										 label="{FileName.DESKTOP_DOT_INI}"
-										 selected="true"
-										 toolTip="Windows のカスファイルです。"/>
-							<mx:CheckBox id="_cbDSStore"
-										 label="{FileName.DOT_DS_STORE}"
-										 selected="true"
-										 toolTip="Mac OS X のカスファイルです。"/>
-							<mx:CheckBox id="_cbMACOSX"
-										 label="{FolderName.__MACOSX}"
-										 selected="true"
-										 toolTip="Mac OS X のカスフォルダです。"/>
-						</s:VGroup>
+				<s:Label text="Mac OS X 関連"
+						 fontWeight="bold"/>
+				<s:VGroup>
+					<mx:CheckBox id="_cbDSStore"
+								 label="{FileName.DOT_DS_STORE}"
+								 selected="true"
+								 toolTip="Mac OS X のカスファイルです。"/>
+					<mx:CheckBox id="_cbMACOSX"
+								 label="{FolderName.__MACOSX + ' フォルダ'}"
+								 selected="true"
+								 toolTip="Mac OS X のカスフォルダです。"/>
+					<mx:CheckBox id="_cbAppleDouble"
+								 label=".AppleDouble"
+								 selected="false"
+								 enabled="false"
+								 toolTip="ファイル名の接頭辞として「._」が付くファイル"/>
+				</s:VGroup>
 
-						<mx:HRule width="160"/>
-						<s:Label text="バージョン管理システム関連"
-								 fontWeight="bold"/>
-						<s:VGroup>
-							<mx:CheckBox id="_cbSVN"
-										 label=".svn フォルダ"
-										 selected="false"
-										 toolTip="Subversion のカスフォルダです。"/>
-						</s:VGroup>
+				<mx:HRule width="100%"/>
+				<s:Label text="バージョン管理システム関連"
+						 fontWeight="bold"/>
+				<s:VGroup>
+					<mx:CheckBox id="_cbSVN"
+								 label=".svn フォルダ"
+								 selected="false"
+								 toolTip="Subversion のカスフォルダです。"/>
+				</s:VGroup>
 
-						<mx:HRule width="100%"/>
-						<s:Label text="Creative Suite 関連"
-								 fontWeight="bold"/>
-						<s:VGroup>
-							<mx:CheckBox id="_cbBridge"
-										 label=".BridgeSort"
-										 selected="false"
-										 toolTip="Adobe Bridge のカスファイルです。"/>
-							<mx:CheckBox id="_cbDreamWeaver"
-										 label="_notes フォルダ"
-										 selected="false"
-										 toolTip="Adobe Dreamweaver のカスフォルダです。"/>
-						</s:VGroup>
-					</s:Group>
-				</s:Scroller>
-			</s:BorderContainer>
-
+				<mx:HRule width="100%"/>
+				<s:Label text="Creative Suite 関連"
+						 fontWeight="bold"/>
+				<s:VGroup>
+					<mx:CheckBox id="_cbBridge"
+								 label=".BridgeSort"
+								 selected="false"
+								 toolTip="Adobe Bridge のカスファイルです。"/>
+					<mx:CheckBox id="_cbDreamWeaver"
+								 label="_notes フォルダ"
+								 selected="false"
+								 toolTip="Adobe Dreamweaver のカスフォルダです。"/>
+				</s:VGroup>
+			</mx:VBox>
 		</s:VGroup>
 
 	</s:HGroup>

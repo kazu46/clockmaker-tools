@@ -161,7 +161,7 @@ mx|Panel
 	fontSize: 12;
 	headerHeight: 23;
 }
-mx|ScrollBar
+mx|ScrollBar,s|ScrollBarBase
 {
 	thumbIcon: Embed(source="scope_skins.swf", symbol="ScrollBar_thumbIcon");
 	downArrowDisabledSkin: Embed(source="scope_skins.swf", symbol="ScrollArrowDown_disabledSkin");
