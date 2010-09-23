@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   applicationComplete="applicationCompleteHandler(event)">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import spark.events.TextOperationEvent;
+
+			private var htmlLoader:HTMLLoader;
+			private var currentTitle:String;
+
+			protected function goBtn_clickHandler(event:MouseEvent):void
+			{
+				htmlLoader = new HTMLLoader();
+				htmlLoader.addEventListener(Event.COMPLETE, htmlLoader_completeHandler);
+				htmlLoader.load(new URLRequest(urlInput.text));
+			}
+
+			protected function okButton_clickHandler(event:MouseEvent):void
+			{
+				// hatena
+				var hatenaForm:Object = hatenaHtml.domWindow.document.getElementById("add-form");
+				if(hatenaForm) hatenaForm.submit();
+
+				// delicious
+				var deliciousForm:Object = deliciousHtml.domWindow.document.getElementById("saveitem");
+				if(deliciousForm) deliciousForm.submit.click();
+			}
+
+			protected function applicationCompleteHandler(event:FlexEvent):void
+			{
+				this.nativeWindow.y = 0;
+				this.nativeWindow.height = Capabilities.screenResolutionY;
+				this.addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, onNativeDragEnter);
+				this.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP, onNativeDragDrop);
+			}
+
+			protected function onNativeDragEnter(e:NativeDragEvent):void
+			{
+				var data:Clipboard = e.clipboard;
+				if (data.hasFormat(ClipboardFormats.URL_FORMAT))
+				{
+					NativeDragManager.acceptDragDrop(this);
+				}
+			}
+
+			protected function onNativeDragDrop(event:NativeDragEvent):void
+			{
+				// クリップボードからデータを取り出す
+				var clipboard:Clipboard = event.clipboard;
+				var list:String = clipboard.getData(ClipboardFormats.URL_FORMAT) as String;
+				urlInput.text = list;
+				goBtn_clickHandler(null);
+			}
+
+			protected function resetButton_clickHandler(event:MouseEvent):void
+			{
+				urlInput.text = "";
+				contextInput.text = "";
+				tagInput.text = "";
+			}
+
+			private function htmlLoader_completeHandler(event:Event):void
+			{
+				currentTitle = htmlLoader.window.document.title;
+
+				hatenaHtml.location = "http://b.hatena.ne.jp/yasu-log/add.confirm?url=" + urlInput.text;
+				deliciousHtml.location = "http://www.delicious.com/save?url=" + encodeURI(urlInput.text) + "&title=" + currentTitle;
+			}
+
+			private function inputForm():void
+			{
+				// tags
+				var tags:Array = tagInput.text.split(" ");
+				var hatenaTagsStr:String = "";
+				var deliciousTagsStr:String = "";
+				if (tagInput.text.length > 0)
+				{
+					for (var i:int = 0; i < tags.length; i++)
+					{
+						hatenaTagsStr += "[" + tags[i] + "]";
+						deliciousTagsStr += tags[i] + " ";
+					}
+				}
+
+				// hatena
+				var hatenaTA:Object = hatenaHtml.domWindow.document.getElementById("comment");
+				hatenaTA.innerHTML = hatenaTagsStr + contextInput.text;
+
+				// delicious
+				var deliciousTitle:Object = deliciousHtml.domWindow.document.getElementById("title");
+				deliciousTitle.value = currentTitle;
+				var deliciousNotes:Object = deliciousHtml.domWindow.document.getElementById("notes");
+				deliciousNotes.value = contextInput.text;
+				var deliciousTags:Object = deliciousHtml.domWindow.document.getElementById("tags");
+				deliciousTags.value = deliciousTagsStr;
+			}
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- 非ビジュアルエレメント (サービス、値オブジェクトなど) をここに配置 -->
+	</fx:Declarations>
+
+	<s:layout>
+		<s:VerticalLayout paddingBottom="10"
+						  paddingLeft="10"
+						  paddingRight="10"
+						  paddingTop="10"/>
+	</s:layout>
+
+	<mx:Form width="100%">
+		<mx:FormItem label="URL"
+					 width="100%">
+			<s:HGroup width="100%">
+				<s:TextInput id="urlInput"
+							 width="100%"
+							 text="http://clockmaker.jp/blog/"/>
+				<s:Button id="goBtn"
+						  click="goBtn_clickHandler(event)"
+						  label="Go"/>
+			</s:HGroup>
+		</mx:FormItem>
+		<mx:FormItem label="Text"
+					 width="100%">
+			<s:TextInput id="contextInput"
+						 width="100%"
+						 change="inputForm();"/>
+		</mx:FormItem>
+		<mx:FormItem label="Tag"
+					 width="100%">
+			<s:TextInput id="tagInput"
+						 width="100%"
+						 change="inputForm();"/>
+		</mx:FormItem>
+	</mx:Form>
+
+	<s:HGroup width="100%"
+			  horizontalAlign="center">
+		<s:Button label="OK"
+				  click="okButton_clickHandler(event)"/>
+		<s:Button label="Reset"
+				  click="resetButton_clickHandler(event)"/>
+	</s:HGroup>
+
+	<s:VGroup width="100%"
+			  height="100%">
+		<mx:HTML id="hatenaHtml"
+				 width="100%"
+				 height="100%"
+				 borderStyle="solid"/>
+		<mx:HTML id="deliciousHtml"
+				 width="100%"
+				 height="100%"
+				 borderStyle="solid"/>
+	</s:VGroup>
+</s:WindowedApplication>
