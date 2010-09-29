@@ -275,11 +275,19 @@ THE SOFTWARE.
 					{
 						_fileArr.push(target);
 					}
-					else if (_cbThumb.selected && fileName == FileName.DOT_BRIDGE_SORT)
+					else if (_cbBridge.selected && fileName == FileName.DOT_BRIDGE_SORT)
+					{
+						_fileArr.push(target);
+					}
+					else if (_cbBridgeSL.selected && fileName == FileName.DOT_BRIDGE_LABELS_AND_RATINGS)
 					{
 						_fileArr.push(target);
 					}
 					else if (_cbDesktopIni.selected && fileName.toLowerCase() == FileName.DESKTOP_DOT_INI.toLowerCase())
+					{
+						_fileArr.push(target);
+					}
+					else if (_cbAppleDouble.selected && fileName.indexOf("._") == 0)
 					{
 						_fileArr.push(target);
 					}
@@ -383,8 +391,10 @@ THE SOFTWARE.
 						_cbSVN: _cbSVN.selected,
 						_cbDreamWeaver: _cbDreamWeaver.selected,
 						_cbBridge: _cbBridge.selected,
+						_cbBridgeSL: _cbBridgeSL.selected,
 						_cbChild: _cbChild.selected,
 						_cbDesktopIni: _cbDesktopIni.selected,
+						_cbAppleDouble: _cbAppleDouble.selected,
 						_cbMACOSX: _cbMACOSX.selected
 					};
 				so.flush();
@@ -400,8 +410,10 @@ THE SOFTWARE.
 					_cbSVN.selected = so.data.config._cbSVN;
 					_cbDreamWeaver.selected = so.data.config._cbDreamWeaver;
 					_cbBridge.selected = so.data.config._cbBridge;
+					_cbBridgeSL.selected = so.data.config._cbBridgeSL;
 					_cbChild.selected = so.data.config._cbChild;
 					_cbDesktopIni.selected = so.data.config._cbDesktopIni;
+					_cbAppleDouble.selected = so.data.config._cbAppleDouble;
 					_cbMACOSX.selected = so.data.config._cbMACOSX;
 				}
 			}
@@ -576,9 +588,8 @@ THE SOFTWARE.
 								 selected="true"
 								 toolTip="Mac OS X のカスフォルダです。"/>
 					<mx:CheckBox id="_cbAppleDouble"
-								 label=".AppleDouble"
-								 selected="false"
-								 enabled="false"
+								 label="AppleDouble File"
+								 selected="true"
 								 toolTip="ファイル名の接頭辞として「._」が付くファイル"/>
 				</s:VGroup>
 
@@ -598,6 +609,10 @@ THE SOFTWARE.
 				<s:VGroup>
 					<mx:CheckBox id="_cbBridge"
 								 label=".BridgeSort"
+								 selected="false"
+								 toolTip="Adobe Bridge のカスファイルです。"/>
+					<mx:CheckBox id="_cbBridgeSL"
+								 label="{FileName.DOT_BRIDGE_LABELS_AND_RATINGS}"
 								 selected="false"
 								 toolTip="Adobe Bridge のカスファイルです。"/>
 					<mx:CheckBox id="_cbDreamWeaver"
