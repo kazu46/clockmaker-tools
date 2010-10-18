@@ -1,32 +1,11 @@
-/*
-   カス削除くん
-
-   The MIT License
-
-   Copyright (c) 2010 Yasunobu Ikeda
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to deal
-   in the Software without restriction, including without limitation the rights
-   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-   THE SOFTWARE.
- */
 package myproject.commands
 {
+	import flash.events.FileListEvent;
 	import flash.filesystem.File;
+	import flash.utils.getTimer;
 	
+	import jp.flair4.lib.events.EnterFrameEventOptimizer;
+	import jp.progression.commands.Command;
 	import jp.progression.commands.Func;
 	import jp.progression.commands.Wait;
 	import jp.progression.commands.lists.SerialList;
@@ -36,30 +15,29 @@ package myproject.commands
 	import myproject.data.SelectedForm;
 
 	/**
-	 * SearchFileCommand はカスファイルを検索するProgression用のコマンドクラスです。
-	 * @author yasu
-	 * @version 1.0.0
+	 * ...
+	 * @author ...
 	 */
-	public class SearchFileCommand extends SerialList
+	public class SearchFileCommand2 extends Command
 	{
-		private static const ASYNC_RESUME_COUNT:Number = 20;
-		private static const WAIT_TIME:Number = 1.000 / 60 * 1;
+		private static const ASYNC_RESUME_COUNT:Number = 75;
+		private static const WAIT_FRAME:int = 2;
 
 		/**
-		 * 新しい SearchFileCommand インスタンスを作成します。
+		 * 新しい MyCommand インスタンスを作成します。
 		 */
-		public function SearchFileCommand(dir:File, form:SelectedForm)
+		public function SearchFileCommand2(dir:File, form:SelectedForm)
 		{
 			_dir = dir;
 			_form = form;
 
+			_stack = [];
 			_seachCount = 0;
 			_seachTotal = 0;
 			_fileArr = new Vector.<File>;
 
-			addCommand(
-				new Func(searchCore, [ dir ])
-				);
+			// 親クラスを初期化します。
+			super(_execute, _interrupt, null);
 		}
 
 		public function get fileArr():Array
@@ -77,12 +55,16 @@ package myproject.commands
 			return _seachCount;
 		}
 
+		public var onPosition:Function;
+
 		private var _form:SelectedForm;
 		private var _seachCount:int = 0;
 		private var _seachTotal:int = 0;
 		private var _asyncCnt:int;
 		private var _fileArr:Vector.<File>;
 		private var _dir:File;
+		private var _stack:Array;
+		private var _interruptFlag:Boolean;
 
 		/**
 		 * @inheritDoc
@@ -95,6 +77,8 @@ package myproject.commands
 			_asyncCnt = 0;
 			_fileArr = null;
 			_dir = null;
+			_stack = null;
+			onPosition = null;
 
 			super.dispose();
 		}
@@ -102,9 +86,9 @@ package myproject.commands
 		/**
 		 * フォルダリスティングのコア処理です。
 		 */
-		protected function searchCore(target:File):void
+		protected function searchCore(file:File):void
 		{
-			if (!target)
+			if (!file)
 				return;
 
 			var isDirectory:Boolean;
@@ -112,8 +96,8 @@ package myproject.commands
 
 			try
 			{
-				isDirectory = target.isDirectory;
-				fileName = target.name;
+				isDirectory = file.isDirectory;
+				fileName = file.name;
 			}
 			catch (e:Error)
 			{
@@ -123,15 +107,15 @@ package myproject.commands
 			{
 				if (_form.selected_DOT_SVN && fileName == FolderName.DOT_SVN)
 				{
-					_fileArr.push(target);
+					_fileArr.push(file);
 				}
 				else if (_form.selected__NOTES && fileName == FolderName._NOTES)
 				{
-					_fileArr.push(target);
+					_fileArr.push(file);
 				}
 				else if (_form.selected___MACOSX && fileName == FolderName.__MACOSX)
 				{
-					_fileArr.push(target);
+					_fileArr.push(file);
 				}
 				else
 				{
@@ -142,23 +126,16 @@ package myproject.commands
 					// サブパッケージを調べる
 					else
 					{
-						var files:Array = target.getDirectoryListing();
+						var files:Array = file.getDirectoryListing();
+						
 						_seachTotal += files.length;
-
+						
 						for (var i:int = 0; i < files.length; i++)
 						{
 							var element:File = files[i] as File;
-
-							// ASYNC_RESUME_COUNT 回ごとに1回休憩する(フレームを進ませる)
-							if (_asyncCnt++ % ASYNC_RESUME_COUNT == 0)
-							{
-								insertCommand(new Wait(WAIT_TIME));
-							}
-
+							
 							// コマンドを追加(再帰処理)
-							insertCommand(
-								new Func(searchCore, [ element ])
-								);
+							_addStack(searchCore, element);
 						}
 					}
 				}
@@ -167,31 +144,85 @@ package myproject.commands
 			{
 				if (_form.selected_DOT_DS_STORE && fileName == FileName.DOT_DS_STORE)
 				{
-					_fileArr.push(target);
+					_fileArr.push(file);
 				}
 				else if (_form.selected_THUMBS_DB && fileName == FileName.THUMBS_DB)
 				{
-					_fileArr.push(target);
+					_fileArr.push(file);
 				}
 				else if (_form.selected_DOT_BRIDGE_SORT && fileName == FileName.DOT_BRIDGE_SORT)
 				{
-					_fileArr.push(target);
+					_fileArr.push(file);
 				}
 				else if (_form.selected_DOT_BRIDGE_LABELS_AND_RATINGS && fileName == FileName.DOT_BRIDGE_LABELS_AND_RATINGS)
 				{
-					_fileArr.push(target);
+					_fileArr.push(file);
 				}
 				else if (_form.selected_DESKTOP_DOT_INI && fileName.toLowerCase() == FileName.DESKTOP_DOT_INI.toLowerCase())
 				{
-					_fileArr.push(target);
+					_fileArr.push(file);
 				}
 				else if (_form.selected_APPLE_DOUBLE && fileName.indexOf("._") == 0)
 				{
-					_fileArr.push(target);
+					_fileArr.push(file);
 				}
 			}
 
 			_seachCount++;
+
+			_next();
+		}
+
+
+		/**
+		 * 実行されるコマンドの実装です。
+		 */
+		private function _execute():void
+		{
+			searchCore(_dir);
+		}
+
+		/**
+		 * 中断されるコマンドの実装です。
+		 */
+		private function _interrupt():void
+		{
+			_interruptFlag = true;
+		}
+
+		private function _addStack(func:Function, ... args):void
+		{
+			_stack.push({func: func, args: args});
+		}
+
+		private function _next():void
+		{
+			if (_interruptFlag)
+				return;
+
+			if (onPosition is Function)
+				onPosition();
+
+			var o:Object = _stack.shift();
+
+			if (o && o.func)
+			{
+				if (_asyncCnt++ % ASYNC_RESUME_COUNT == 0)
+				{
+					EnterFrameEventOptimizer.once(function():void{
+							o.func.apply(this, o.args);
+						}, WAIT_FRAME);
+				}
+				else
+				{
+					o.func.apply(this, o.args);
+				}
+			}
+			if (_stack.length == 0)
+			{
+				executeComplete();
+				return;
+			}
 		}
 	}
 }

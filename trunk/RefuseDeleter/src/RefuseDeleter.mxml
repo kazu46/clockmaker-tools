@@ -71,6 +71,7 @@ THE SOFTWARE.
 			import mx.managers.PopUpManager;
 			
 			import myproject.commands.SearchFileCommand;
+			import myproject.commands.SearchFileCommand2;
 			import myproject.data.FileName;
 			import myproject.data.FolderName;
 			import myproject.data.SelectedForm;
@@ -174,17 +175,17 @@ THE SOFTWARE.
 				form.selected_DOT_SVN = _cbSVN.selected;
 				form.selected_THUMBS_DB = _cbThumb.selected;
 				
-				var searchCommand:SearchFileCommand = new SearchFileCommand(_dir, form);
-//				searchCommand.onPosition = function():void
-//				{
-//					_progressPanel.progress.label = "検索中(" + searchCommand.seachCount + "項目)";
-//				};
+				var searchCommand:SearchFileCommand2 = new SearchFileCommand2(_dir, form);
+				searchCommand.onPosition = function():void
+				{
+					_progressPanel.progress.label = "検索中(" + searchCommand.seachCount + "項目)";
+				};
 				
 				var oldTime:Number = getTimer();
 				
 				// 非同期処理用コマンドの作成
 				_cmd = new SerialList();
-				_cmd.onComplete = function():void
+				_cmd.onComplete = _cmd.onInterrupt = function():void
 				{
 					_cmd.dispose();
 					_cmd = null;
