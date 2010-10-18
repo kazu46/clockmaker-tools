@@ -61,10 +61,7 @@ THE SOFTWARE.
 
 	<fx:Script>
 		<![CDATA[
-			import flash.net.navigateToURL;
-			
-			import jp.progression.commands.Func;
-			import jp.progression.commands.Wait;
+			import jp.nium.core.debug.Logger;
 			import jp.progression.commands.lists.SerialList;
 			
 			import mx.controls.Alert;
@@ -72,26 +69,18 @@ THE SOFTWARE.
 			import mx.events.FlexEvent;
 			import mx.events.ListEvent;
 			import mx.managers.PopUpManager;
-			import mx.rpc.events.FaultEvent;
-			import mx.rpc.events.ResultEvent;
 			
+			import myproject.commands.SearchFileCommand;
 			import myproject.data.FileName;
 			import myproject.data.FolderName;
+			import myproject.data.SelectedForm;
 			import myproject.ui.ProgressPanel;
-
-			private static const ASYNC_RESUME_COUNT:Number = 20;
-
-			private var _asyncCnt:int;
-			private var _cmd:SerialList;
 
 			[Bindable]
 			private var _dir:File;
 			private var _fileArr:Array;
-
 			private var _progressPanel:ProgressPanel;
-
-			private var _seachCount:int = 0;
-			private var _seachTotal:int = 0;
+			private var _cmd:SerialList;
 
 			/**
 			 * 非同期コマンドを中断します。
@@ -171,27 +160,50 @@ THE SOFTWARE.
 
 			protected function searchFiles():void
 			{
-				_seachCount = 0;
-				_seachTotal = 0;
-
 				var self:* = this;
-
+				
+				var form:SelectedForm = new SelectedForm();
+				form.selectedCheckChild = _cbChild.selected;
+				form.selected___MACOSX = _cbMACOSX.selected;
+				form.selected__NOTES = _cbDreamWeaver.selected;
+				form.selected_APPLE_DOUBLE = _cbAppleDouble.selected;
+				form.selected_DESKTOP_DOT_INI = _cbDesktopIni.selected;
+				form.selected_DOT_BRIDGE_LABELS_AND_RATINGS = _cbBridgeSL.selected;
+				form.selected_DOT_BRIDGE_SORT = _cbBridge.selected;
+				form.selected_DOT_DS_STORE = _cbDSStore.selected;
+				form.selected_DOT_SVN = _cbSVN.selected;
+				form.selected_THUMBS_DB = _cbThumb.selected;
+				
+				var searchCommand:SearchFileCommand = new SearchFileCommand(_dir, form);
+//				searchCommand.onPosition = function():void
+//				{
+//					_progressPanel.progress.label = "検索中(" + searchCommand.seachCount + "項目)";
+//				};
+				
+				var oldTime:Number = getTimer();
+				
 				// 非同期処理用コマンドの作成
 				_cmd = new SerialList();
+				_cmd.onComplete = function():void
+				{
+					_cmd.dispose();
+					_cmd = null;
+				};
 				_cmd.addCommand(
 					// 初期化
 					function():void{
 						_fileArr = [];
 						_fileArrCl.source = _fileArr;
 						_fileNum = _fileArr.length;
-						_asyncCnt = 0;
 						PopUpManager.addPopUp(_progressPanel, self, true);
 						PopUpManager.centerPopUp(_progressPanel);
 					},
 					// 検索開始
-					new Func(searchCore, [ _dir ]),
+					searchCommand,
 					// 終了処理
 					function():void{
+						Logger.info("検索時間", (getTimer() - oldTime)/1000 + "秒");
+						_fileArr = searchCommand.fileArr.concat();
 						_fileArrCl.source = _fileArr;
 						_fileNum = _fileArr.length;
 						PopUpManager.removePopUp(_progressPanel);
@@ -199,102 +211,6 @@ THE SOFTWARE.
 					);
 				// コマンドの実行
 				_cmd.execute();
-			}
-
-			/**
-			 * フォルダリスティングのコア処理です。
-			 */
-			protected function searchCore(target:File):void
-			{
-				if (!target)
-					return;
-
-				var isDirectory:Boolean;
-				var fileName:String;
-
-				try
-				{
-					isDirectory = target.isDirectory;
-					fileName = target.name;
-				}
-				catch (e:Error)
-				{
-				}
-
-				if (isDirectory)
-				{
-					if (_cbSVN.selected && fileName == FolderName.DOT_SVN)
-					{
-						_fileArr.push(target);
-					}
-					else if (_cbDreamWeaver.selected && fileName == FolderName._NOTES)
-					{
-						_fileArr.push(target);
-					}
-					else if (_cbMACOSX.selected && fileName == FolderName.__MACOSX)
-					{
-						_fileArr.push(target);
-					}
-					else
-					{
-						// サブパッケージを調べない
-						if (!_cbChild.selected && _seachTotal != 0)
-						{
-						}
-						// サブパッケージを調べる
-						else
-						{
-							var files:Array = target.getDirectoryListing();
-							_seachTotal += files.length;
-							for (var i:int = 0; i < files.length; i++)
-							{
-								var element:File = files[i] as File;
-
-								// コマンドを追加(再帰処理)
-								_cmd.insertCommand(
-									new Func(searchCore, [ element ])
-									);
-
-								// ASYNC_RESUME_COUNT 回ごとに1回休憩する(フレームを進ませる)
-								if (_asyncCnt++ % ASYNC_RESUME_COUNT == 0)
-								{
-									_cmd.insertCommand(new Wait(0.016));
-								}
-							}
-						}
-
-					}
-				}
-				else
-				{
-					if (_cbDSStore.selected && fileName == FileName.DOT_DS_STORE)
-					{
-						_fileArr.push(target);
-					}
-					else if (_cbThumb.selected && fileName == FileName.THUMBS_DB)
-					{
-						_fileArr.push(target);
-					}
-					else if (_cbBridge.selected && fileName == FileName.DOT_BRIDGE_SORT)
-					{
-						_fileArr.push(target);
-					}
-					else if (_cbBridgeSL.selected && fileName == FileName.DOT_BRIDGE_LABELS_AND_RATINGS)
-					{
-						_fileArr.push(target);
-					}
-					else if (_cbDesktopIni.selected && fileName.toLowerCase() == FileName.DESKTOP_DOT_INI.toLowerCase())
-					{
-						_fileArr.push(target);
-					}
-					else if (_cbAppleDouble.selected && fileName.indexOf("._") == 0)
-					{
-						_fileArr.push(target);
-					}
-				}
-
-				_progressPanel.progress.label = "検索中(" + _seachCount + "項目)";
-				_seachCount++;
 			}
 
 			protected function onNativeDragEnter(e:NativeDragEvent):void
