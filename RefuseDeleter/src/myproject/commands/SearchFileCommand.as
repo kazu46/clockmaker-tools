@@ -26,6 +26,8 @@
 package myproject.commands
 {
 	import flash.filesystem.File;
+	import flash.system.System;
+	import flash.utils.getTimer;
 	
 	import jp.progression.commands.Func;
 	import jp.progression.commands.Wait;
@@ -42,7 +44,8 @@ package myproject.commands
 	 */
 	public class SearchFileCommand extends SerialList
 	{
-		private static const ASYNC_RESUME_COUNT:Number = 20;
+		private static const ASYNC_RESUME_COUNT:Number = 50;
+		private static const GC_COUNT:Number = 500;
 		private static const WAIT_TIME:Number = 1.000 / 60 * 1;
 
 		/**
@@ -142,24 +145,13 @@ package myproject.commands
 					// サブパッケージを調べる
 					else
 					{
-						var files:Array = target.getDirectoryListing();
-						_seachTotal += files.length;
-
-						for (var i:int = 0; i < files.length; i++)
-						{
-							var element:File = files[i] as File;
-
-							// ASYNC_RESUME_COUNT 回ごとに1回休憩する(フレームを進ませる)
-							if (_asyncCnt++ % ASYNC_RESUME_COUNT == 0)
-							{
-								insertCommand(new Wait(WAIT_TIME));
+						insertCommand(
+							new GetDirectoryListing(target),
+							function():void{
+								var files:Array = GetDirectoryListing(this.previous).files;
+								_searchSubDirectory(files);
 							}
-
-							// コマンドを追加(再帰処理)
-							insertCommand(
-								new Func(searchCore, [ element ])
-								);
-						}
+						);
 					}
 				}
 			}
@@ -192,6 +184,42 @@ package myproject.commands
 			}
 
 			_seachCount++;
+		}
+		
+		private function _searchSubDirectory(files:Array):void
+		{
+			_seachTotal += files.length;
+			
+			for (var i:int = 0; i < files.length; i++)
+			{
+				var element:File = files[i] as File;
+				
+				// ASYNC_RESUME_COUNT 回ごとに1回休憩する(フレームを進ませる)
+				if (_asyncCnt++ % ASYNC_RESUME_COUNT == 0)
+				{
+					insertCommand(new Wait(WAIT_TIME));
+				}
+				// GC_COUNT 回ごとに1回GCする
+				if (_asyncCnt % GC_COUNT == 0)
+				{
+					insertCommand(
+						new Wait(WAIT_TIME),
+						function():void{
+							var old:Number = getTimer();
+							
+							try{
+								System.gc();
+							}catch(e:*){}
+							
+							trace("gc", getTimer() - old);
+						});
+				}
+				
+				// コマンドを追加(再帰処理)
+				insertCommand(
+					new Func(searchCore, [ element ])
+				);
+			}
 		}
 	}
 }
