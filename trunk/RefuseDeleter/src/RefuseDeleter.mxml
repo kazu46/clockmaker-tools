@@ -175,7 +175,7 @@ THE SOFTWARE.
 				form.selected_DOT_SVN = _cbSVN.selected;
 				form.selected_THUMBS_DB = _cbThumb.selected;
 				
-				var searchCommand:SearchFileCommand2 = new SearchFileCommand2(_dir, form);
+				var searchCommand:SearchFileCommand = new SearchFileCommand(_dir, form);
 				searchCommand.onPosition = function():void
 				{
 					_progressPanel.progress.label = "検索中(" + searchCommand.seachCount + "項目)";
@@ -189,6 +189,10 @@ THE SOFTWARE.
 				{
 					_cmd.dispose();
 					_cmd = null;
+					
+					try{
+						System.gc();
+					}catch(e:*){}
 				};
 				_cmd.addCommand(
 					// 初期化
