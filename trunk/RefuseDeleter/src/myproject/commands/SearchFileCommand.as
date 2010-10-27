@@ -44,9 +44,9 @@ package myproject.commands
 	 */
 	public class SearchFileCommand extends SerialList
 	{
-		private static const ASYNC_RESUME_COUNT:Number = 50;
+		private static const ASYNC_RESUME_COUNT:Number = 20;
 		private static const GC_COUNT:Number = 500;
-		private static const WAIT_TIME:Number = 1.000 / 60 * 1;
+		private static const WAIT_TIME:Number = 1.000 / 60 * 3;
 
 		/**
 		 * 新しい SearchFileCommand インスタンスを作成します。
@@ -59,10 +59,11 @@ package myproject.commands
 			_seachCount = 0;
 			_seachTotal = 0;
 			_fileArr = new Vector.<File>;
-
+			
 			addCommand(
 				new Func(searchCore, [ dir ])
 				);
+			
 		}
 
 		public function get fileArr():Array
@@ -200,20 +201,20 @@ package myproject.commands
 					insertCommand(new Wait(WAIT_TIME));
 				}
 				// GC_COUNT 回ごとに1回GCする
-				if (_asyncCnt % GC_COUNT == 0)
-				{
-					insertCommand(
-						new Wait(WAIT_TIME),
-						function():void{
-							var old:Number = getTimer();
-							
-							try{
-								System.gc();
-							}catch(e:*){}
-							
-							trace("gc", getTimer() - old);
-						});
-				}
+//				if (_asyncCnt % GC_COUNT == 0)
+//				{
+//					insertCommand(
+//						new Wait(WAIT_TIME),
+//						function():void{
+//							var old:Number = getTimer();
+//							
+//							try{
+//								System.gc();
+//							}catch(e:*){}
+//							
+//							trace("gc", getTimer() - old);
+//						});
+//				}
 				
 				// コマンドを追加(再帰処理)
 				insertCommand(
