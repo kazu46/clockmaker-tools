@@ -113,8 +113,8 @@ THE SOFTWARE.
 				resumeSharedObject();
 				
 				var message:XML = this.nativeApplication.applicationDescriptor;
-				var atom:Namespace = new Namespace("http://ns.adobe.com/air/application/2.0");
-				versionLabel.text = "Version " + message.atom::version;
+				var atom:Namespace = new Namespace("http://ns.adobe.com/air/application/2.5");
+				versionLabel.text = "Version " + message.atom::versionNumber;
 			}
 
 			protected function preinitializeHandler(event:FlexEvent):void
@@ -299,7 +299,7 @@ THE SOFTWARE.
 					_fileArrCl.source = _fileArr;
 					_fileNum = _fileArr.length;
 
-					Alert.show("\n" + "カスを削除しました", "完了");
+					Alert.show("\n" + "カスを削除しました", "完了", 2);
 				}
 			}
 
@@ -475,7 +475,7 @@ THE SOFTWARE.
 				<s:Label text="オプション"
 						 fontWeight="bold"/>
 				<s:VGroup>
-					<mx:CheckBox id="_cbChild"
+					<s:CheckBox id="_cbChild"
 								 label="サブフォルダも含める"
 								 selected="true"/>
 				</s:VGroup>
@@ -485,11 +485,11 @@ THE SOFTWARE.
 				<s:Label text="Windows 関連"
 						 fontWeight="bold"/>
 				<s:VGroup>
-					<mx:CheckBox id="_cbThumb"
+					<s:CheckBox id="_cbThumb"
 								 label="{FileName.THUMBS_DB}"
 								 selected="true"
 								 toolTip="Windows のカスファイルです。"/>
-					<mx:CheckBox id="_cbDesktopIni"
+					<s:CheckBox id="_cbDesktopIni"
 								 label="{FileName.DESKTOP_DOT_INI}"
 								 selected="true"
 								 toolTip="Windows のカスファイルです。"/>
@@ -500,15 +500,15 @@ THE SOFTWARE.
 				<s:Label text="Mac OS X 関連"
 						 fontWeight="bold"/>
 				<s:VGroup>
-					<mx:CheckBox id="_cbDSStore"
+					<s:CheckBox id="_cbDSStore"
 								 label="{FileName.DOT_DS_STORE}"
 								 selected="true"
 								 toolTip="Mac OS X のカスファイルです。"/>
-					<mx:CheckBox id="_cbMACOSX"
+					<s:CheckBox id="_cbMACOSX"
 								 label="{FolderName.__MACOSX + ' フォルダ'}"
 								 selected="true"
 								 toolTip="Mac OS X のカスフォルダです。"/>
-					<mx:CheckBox id="_cbAppleDouble"
+					<s:CheckBox id="_cbAppleDouble"
 								 label="AppleDouble File"
 								 selected="true"
 								 toolTip="ファイル名の接頭辞として「._」が付くファイル"/>
@@ -518,7 +518,7 @@ THE SOFTWARE.
 				<s:Label text="バージョン管理システム関連"
 						 fontWeight="bold"/>
 				<s:VGroup>
-					<mx:CheckBox id="_cbSVN"
+					<s:CheckBox id="_cbSVN"
 								 label=".svn フォルダ"
 								 selected="false"
 								 toolTip="Subversion のカスフォルダです。"/>
@@ -528,15 +528,15 @@ THE SOFTWARE.
 				<s:Label text="Creative Suite 関連"
 						 fontWeight="bold"/>
 				<s:VGroup>
-					<mx:CheckBox id="_cbBridge"
+					<s:CheckBox id="_cbBridge"
 								 label=".BridgeSort"
 								 selected="false"
 								 toolTip="Adobe Bridge のカスファイルです。"/>
-					<mx:CheckBox id="_cbBridgeSL"
+					<s:CheckBox id="_cbBridgeSL"
 								 label="{FileName.DOT_BRIDGE_LABELS_AND_RATINGS}"
 								 selected="false"
 								 toolTip="Adobe Bridge のカスファイルです。"/>
-					<mx:CheckBox id="_cbDreamWeaver"
+					<s:CheckBox id="_cbDreamWeaver"
 								 label="_notes フォルダ"
 								 selected="false"
 								 toolTip="Adobe Dreamweaver のカスフォルダです。"/>

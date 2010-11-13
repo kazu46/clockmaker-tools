@@ -29,6 +29,7 @@ package myproject.commands
 	import flash.system.System;
 	import flash.utils.getTimer;
 	
+	import jp.progression.commands.Command;
 	import jp.progression.commands.Func;
 	import jp.progression.commands.Wait;
 	import jp.progression.commands.lists.SerialList;
@@ -44,9 +45,9 @@ package myproject.commands
 	 */
 	public class SearchFileCommand extends SerialList
 	{
-		private static const ASYNC_RESUME_COUNT:Number = 20;
+		private static const ASYNC_RESUME_COUNT:Number = 50;
 		private static const GC_COUNT:Number = 500;
-		private static const WAIT_TIME:Number = 1.000 / 60 * 3;
+		private static const WAIT_TIME:Number = 1.000 / 60 * 2;
 
 		/**
 		 * 新しい SearchFileCommand インスタンスを作成します。
@@ -63,7 +64,6 @@ package myproject.commands
 			addCommand(
 				new Func(searchCore, [ dir ])
 				);
-			
 		}
 
 		public function get fileArr():Array
@@ -146,12 +146,10 @@ package myproject.commands
 					// サブパッケージを調べる
 					else
 					{
+						var getDirectoryListing:Command = new GetDirectoryListing(target);
 						insertCommand(
-							new GetDirectoryListing(target),
-							function():void{
-								var files:Array = GetDirectoryListing(this.previous).files;
-								_searchSubDirectory(files);
-							}
+							getDirectoryListing,
+							new Func(ret, [getDirectoryListing])
 						);
 					}
 				}
@@ -221,6 +219,11 @@ package myproject.commands
 					new Func(searchCore, [ element ])
 				);
 			}
+		}
+		
+		private function ret(getDirectoryListing:GetDirectoryListing):void{
+			var files:Array = getDirectoryListing.files;
+			_searchSubDirectory(files);
 		}
 	}
 }
