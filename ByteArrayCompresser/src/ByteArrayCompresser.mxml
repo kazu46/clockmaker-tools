@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+
+			private var _text:String;
+
+			private var fr:FileReference;
+
+			protected function loadFileCompress():void
+			{
+				fr = new FileReference();
+				fr.addEventListener(Event.SELECT, function():void{fr.load();});
+				fr.addEventListener(Event.COMPLETE, function():void{convert(fr.data);});
+				fr.browse();
+			}
+
+			protected function loadFileUnCompress():void
+			{
+				fr = new FileReference();
+				fr.addEventListener(Event.SELECT, function():void{fr.load();});
+				fr.addEventListener(Event.COMPLETE, function():void{convertUnCompress(fr.data);});
+				fr.browse();
+			}
+
+			private function convert(data:ByteArray):void
+			{
+				try
+				{
+					_text = data.readMultiByte(data.length, "UTF-8");
+					textArea.text = _text;
+				}
+				catch (error:Error)
+				{
+					Alert.show("Fail to open");
+				}
+			}
+
+			private function saveFileCompress():void
+			{
+				var ba:ByteArray = new ByteArray();
+				ba.writeUTFBytes(_text);
+				ba.compress();
+
+				fr = new FileReference();
+				fr.save(ba, "mydata.dat");
+			}
+
+			private function convertUnCompress(data:ByteArray):void
+			{
+				try
+				{
+					data.uncompress();
+					_text = data.readUTFBytes(data.length);
+					textArea.text = _text;
+				}
+				catch (error:Error)
+				{
+					Alert.show("Fail to open");
+				}
+			}
+
+			private function saveFileUnCompress():void
+			{
+				fr = new FileReference();
+				fr.save(_text, "mydata.txt");
+			}
+		]]>
+	</fx:Script>
+
+	<s:layout>
+		<s:VerticalLayout gap="10"
+						  paddingBottom="10"
+						  paddingLeft="10"
+						  paddingRight="10"
+						  paddingTop="10"/>
+	</s:layout>
+
+	<s:Label text="ByteArrayでテキストを圧縮・解凍する君"/>
+
+	<s:Label text="圧縮"
+			 fontWeight="bold"/>
+	<s:HGroup>
+		<s:Button label="テキストファイルを開く"
+				  click="loadFileCompress()"/>
+		<s:Button label="圧縮データで保存する"
+				  click="saveFileCompress()"/>
+	</s:HGroup>
+
+	<s:Label text="解凍"
+			 fontWeight="bold"/>
+	<s:HGroup>
+		<s:Button label="圧縮データを開く"
+				  click="loadFileUnCompress()"/>
+		<s:Button label="テキストファイルで保存する"
+				  click="saveFileUnCompress()"/>
+	</s:HGroup>
+
+	<s:TextArea id="textArea"
+				width="100%"
+				height="100%"/>
+
+</s:WindowedApplication>
