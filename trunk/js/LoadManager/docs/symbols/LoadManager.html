@@ -1,0 +1,990 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="generator" content="JsDoc Toolkit" />
+		
+		<title>JsDoc Reference - LoadManager</title>
+
+		<style type="text/css">
+			/* default.css */
+body
+{
+	font: 12px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
+	width: 800px;
+}
+
+.header
+{
+	clear: both;
+	background-color: #ccc;
+	padding: 8px;
+}
+
+h1
+{
+	font-size: 150%;
+	font-weight: bold;
+	padding: 0;
+	margin: 1em 0 0 .3em;
+}
+
+hr
+{
+	border: none 0;
+	border-top: 1px solid #7F8FB1;
+	height: 1px;
+}
+
+pre.code
+{
+	display: block;
+	padding: 8px;
+	border: 1px dashed #ccc;
+}
+
+#index
+{
+	margin-top: 24px;
+	float: left;
+	width: 160px;
+	position: absolute;
+	left: 8px;
+	background-color: #F3F3F3;
+	padding: 8px;
+}
+
+#content
+{
+	margin-left: 190px;
+	width: 600px;
+}
+
+.classList
+{
+	list-style-type: none;
+	padding: 0;
+	margin: 0 0 0 8px;
+	font-family: arial, sans-serif;
+	font-size: 1em;
+	overflow: auto;
+}
+
+.classList li
+{
+	padding: 0;
+	margin: 0 0 8px 0;
+}
+
+.summaryTable { width: 100%; }
+
+h1.classTitle
+{
+	font-size:170%;
+	line-height:130%;
+}
+
+h2 { font-size: 110%; }
+caption, div.sectionTitle
+{
+	background-color: #7F8FB1;
+	color: #fff;
+	font-size:130%;
+	text-align: left;
+	padding: 2px 6px 2px 6px;
+	border: 1px #7F8FB1 solid;
+}
+
+div.sectionTitle { margin-bottom: 8px; }
+.summaryTable thead { display: none; }
+
+.summaryTable td
+{
+	vertical-align: top;
+	padding: 4px;
+	border-bottom: 1px #7F8FB1 solid;
+	border-right: 1px #7F8FB1 solid;
+}
+
+/*col#summaryAttributes {}*/
+.summaryTable td.attributes
+{
+	border-left: 1px #7F8FB1 solid;
+	width: 140px;
+	text-align: right;
+}
+
+td.attributes, .fixedFont
+{
+	line-height: 15px;
+	color: #002EBE;
+	font-family: "Courier New",Courier,monospace;
+	font-size: 13px;
+}
+
+.summaryTable td.nameDescription
+{
+	text-align: left;
+	font-size: 13px;
+	line-height: 15px;
+}
+
+.summaryTable td.nameDescription, .description
+{
+	line-height: 15px;
+	padding: 4px;
+	padding-left: 4px;
+}
+
+.summaryTable { margin-bottom: 8px; }
+
+ul.inheritsList
+{
+	list-style: square;
+	margin-left: 20px;
+	padding-left: 0;
+}
+
+.detailList {
+	margin-left: 20px; 
+	line-height: 15px;
+}
+.detailList dt { margin-left: 20px; }
+
+.detailList .heading
+{
+	font-weight: bold;
+	padding-bottom: 6px;
+	margin-left: 0;
+}
+
+.light, td.attributes, .light a:link, .light a:visited
+{
+	color: #777;
+	font-style: italic;
+}
+
+.fineprint
+{
+	text-align: right;
+	font-size: 10px;
+}
+		</style>
+	</head>
+
+	<body>
+<!-- ============================== header ================================= -->	
+		<!-- begin static/header.html -->
+		<div id="header">
+</div>
+		<!-- end static/header.html -->
+
+<!-- ============================== classes index ============================ -->
+		<div id="index">
+			<!-- begin publish.classesIndex -->
+			<div align="center"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+<hr />
+<h2>Classes</h2>
+<ul class="classList">
+	
+	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	
+	<li><a href="../symbols/lmlib.html">lmlib</a></li>
+	
+	<li><a href="../symbols/lmlib.CompleteEvent.html">lmlib.CompleteEvent</a></li>
+	
+	<li><a href="../symbols/lmlib.ErrorEvent.html">lmlib.ErrorEvent</a></li>
+	
+	<li><a href="../symbols/lmlib.LoadingData.html">lmlib.LoadingData</a></li>
+	
+	<li><a href="../symbols/lmlib.ProgressEvent.html">lmlib.ProgressEvent</a></li>
+	
+	<li><a href="../symbols/LoadManager.html">LoadManager</a></li>
+	
+</ul>
+<hr />
+			<!-- end publish.classesIndex -->
+		</div>
+		
+		<div id="content">
+<!-- ============================== class title ============================ -->
+			<h1 class="classTitle">
+				
+				Class LoadManager
+			</h1>
+
+<!-- ============================== class summary ========================== -->			
+			<p class="description">
+				<br />Version
+					2.0.0 alpha.<br />
+				
+				
+			
+				
+				
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/src_LoadManager.js.html">LoadManager.js</a>.
+				
+			</p>
+
+<!-- ============================== constructor summary ==================== -->			
+			
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class LoadManager.">
+				<caption>Class Summary</caption>
+				<thead>
+					<tr>
+						<th scope="col">Constructor Attributes</th>
+						<th scope="col">Constructor Name and Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="attributes">&nbsp;</td>
+						<td class="nameDescription" >
+							<div class="fixedFont">
+								<b><a href="../symbols/LoadManager.html#constructor">LoadManager</a></b>()
+							</div>
+							<div class="description">LoadManager は Image オブジェクトの読み込みを管理するクラスです。.</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+
+<!-- ============================== properties summary ===================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class LoadManager.">
+					<caption>Field Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Field Attributes</th>
+							<th scope="col">Field Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &lt;constant&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								LoadManager.<b><a href="../symbols/LoadManager.html#.LOG_ERRORS">LOG_ERRORS</a></b>
+								</div>
+								<div class="description">LogLevel: エラーのときだけログを出力します。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &lt;constant&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								LoadManager.<b><a href="../symbols/LoadManager.html#.LOG_SILENT">LOG_SILENT</a></b>
+								</div>
+								<div class="description">LogLevel: ログは一切出力しません。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &lt;constant&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								LoadManager.<b><a href="../symbols/LoadManager.html#.LOG_VERBOSE">LOG_VERBOSE</a></b>
+								</div>
+								<div class="description">LogLevel: すべてのログを出力します。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/LoadManager.html#logLevel">logLevel</a></b>
+								</div>
+								<div class="description">ログのレベルを取得または設定します。デフォルトは LOG_SILENT (出力なし) です。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/LoadManager.html#numConnections">numConnections</a></b>
+								</div>
+								<div class="description">同時接続数です。デフォルトは6です。</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
+
+<!-- ============================== methods summary ======================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class LoadManager.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#add">add</a></b>(url, extra)
+								</div>
+								<div class="description">読み込みたいアセットを登録します。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#get">get</a></b>(url)
+								</div>
+								<div class="description">URLをキーとして読み込み済みアセットを取得します。
+なるべく読み込み完了後(onCompete発生後)に使ってください。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#getFailedItems">getFailedItems</a></b>()
+								</div>
+								<div class="description">読み込みに失敗したアイテムを配列として取得します。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#getIsFinished">getIsFinished</a></b>()
+								</div>
+								<div class="description">処理が完了しているかどうかを取得します。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#getIsRunning">getIsRunning</a></b>()
+								</div>
+								<div class="description">処理が走っているかどうかを取得します。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#getPercent">getPercent</a></b>()
+								</div>
+								<div class="description">処理の進行度を0～1の値で取得します。 (either IO Error).</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#getSuccessItems">getSuccessItems</a></b>()
+								</div>
+								<div class="description">読み込みに成功したアイテムを配列として取得します。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#onComplete">onComplete</a></b>()
+								</div>
+								<div class="description">処理完了時に呼ばれるコールバックです。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#onError">onError</a></b>()
+								</div>
+								<div class="description">エラー発生時に呼ばれるコールバックです。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#onProgress">onProgress</a></b>()
+								</div>
+								<div class="description">プログレスイベント発生時に呼ばれるコールバックです。</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/LoadManager.html#start">start</a></b>(withConnections)
+								</div>
+								<div class="description">読み込み処理を開始します。</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
+<!-- ============================== events summary ======================== -->
+			
+
+<!-- ============================== constructor details ==================== -->		
+			
+			<div class="details"><a name="constructor"> </a>
+				<div class="sectionTitle">
+					Class Detail
+				</div>
+				
+				<div class="fixedFont">
+						<b>LoadManager</b>()
+				</div>
+				
+				<div class="description">
+					LoadManager は Image オブジェクトの読み込みを管理するクラスです。.
+					<br /><i>Author: </i>Yasunobu Ikeda ( http://clockmaker.jp ).
+				</div>
+				
+				
+				
+				
+					
+					
+					
+					
+					
+					
+					
+
+			</div>
+			
+
+<!-- ============================== field details ========================== -->		
+			
+				<div class="sectionTitle">
+					Field Detail
+				</div>
+				
+					<a name=".LOG_ERRORS"> </a>
+					<div class="fixedFont">&lt;static&gt; &lt;constant&gt; 
+					
+					<span class="light">{Number}</span>
+					<span class="light">LoadManager.</span><b>LOG_ERRORS</b>
+					
+					</div>
+					<div class="description">
+						LogLevel: エラーのときだけログを出力します。
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".LOG_SILENT"> </a>
+					<div class="fixedFont">&lt;static&gt; &lt;constant&gt; 
+					
+					<span class="light">{Number}</span>
+					<span class="light">LoadManager.</span><b>LOG_SILENT</b>
+					
+					</div>
+					<div class="description">
+						LogLevel: ログは一切出力しません。
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".LOG_VERBOSE"> </a>
+					<div class="fixedFont">&lt;static&gt; &lt;constant&gt; 
+					
+					<span class="light">{Number}</span>
+					<span class="light">LoadManager.</span><b>LOG_VERBOSE</b>
+					
+					</div>
+					<div class="description">
+						LogLevel: すべてのログを出力します。
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="logLevel"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Number}</span>
+					<b>logLevel</b>
+					
+					</div>
+					<div class="description">
+						ログのレベルを取得または設定します。デフォルトは LOG_SILENT (出力なし) です。
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="numConnections"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Number}</span>
+					<b>numConnections</b>
+					
+					</div>
+					<div class="description">
+						同時接続数です。デフォルトは6です。
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Default Value:</dt>
+							<dd>
+								6
+							</dd>
+							</dl>
+						
+
+					
+				
+			
+
+<!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name="add"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/lmlib.LoadingData.html">lmlib.LoadingData</a>}</span>
+					<b>add</b>(url, extra)
+					
+					</div>
+					<div class="description">
+						読み込みたいアセットを登録します。
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>url</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>extra</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/lmlib.LoadingData.html">lmlib.LoadingData</a>}</span> 読み込みアイテムの情報です。</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="get"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/lmlib.LoadingData.html">lmlib.LoadingData</a>}</span>
+					<b>get</b>(url)
+					
+					</div>
+					<div class="description">
+						URLをキーとして読み込み済みアセットを取得します。
+なるべく読み込み完了後(onCompete発生後)に使ってください。
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>url</b>
+									
+								</dt>
+								<dd>URLです。このURLと一致するアセットを返します。</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/lmlib.LoadingData.html">lmlib.LoadingData</a>}</span> 読み込み情報を保持したデータです。</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getFailedItems"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Array}</span>
+					<b>getFailedItems</b>()
+					
+					</div>
+					<div class="description">
+						読み込みに失敗したアイテムを配列として取得します。
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Array}</span> Array of LoadingData</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getIsFinished"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>getIsFinished</b>()
+					
+					</div>
+					<div class="description">
+						処理が完了しているかどうかを取得します。
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getIsRunning"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>getIsRunning</b>()
+					
+					</div>
+					<div class="description">
+						処理が走っているかどうかを取得します。
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getPercent"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Number}</span>
+					<b>getPercent</b>()
+					
+					</div>
+					<div class="description">
+						処理の進行度を0～1の値で取得します。 (either IO Error).
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getSuccessItems"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Array}</span>
+					<b>getSuccessItems</b>()
+					
+					</div>
+					<div class="description">
+						読み込みに成功したアイテムを配列として取得します。
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Array}</span> Array of LoadingData</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="onComplete"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>onComplete</b>()
+					
+					</div>
+					<div class="description">
+						処理完了時に呼ばれるコールバックです。
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="onError"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>onError</b>()
+					
+					</div>
+					<div class="description">
+						エラー発生時に呼ばれるコールバックです。
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="onProgress"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>onProgress</b>()
+					
+					</div>
+					<div class="description">
+						プログレスイベント発生時に呼ばれるコールバックです。
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="start"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>start</b>(withConnections)
+					
+					</div>
+					<div class="description">
+						読み込み処理を開始します。
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>withConnections</b>
+									
+								</dt>
+								<dd>(default = null) — [optional] 同時読み込み数です。</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					
+				
+			
+			
+<!-- ============================== event details ========================= -->		
+			
+			
+			<hr />
+		</div>
+
+		
+<!-- ============================== footer ================================= -->
+		<div class="fineprint" style="clear:both">
+			
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Feb 11 2012 19:12:22 GMT+0900 (JST)
+		</div>
+	</body>
+</html>

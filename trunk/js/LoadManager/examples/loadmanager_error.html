@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>LoadManager.js Example</title>
+	<script src="../src/LoadManager.js"></script>
+	<script src="jquery-1.7.1.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Ropa+Sans' rel='stylesheet' type='text/css'>
+	<link href='style.css' rel='stylesheet' type='text/css'>
+	<script>
+		function init() {
+			var MAX = 40;
+			for (var i = 0; i < MAX; i++) {
+				$("#container").append('<div id="thumb_' + i + '" class="thumb"></div>');
+			}
+			var manager = new LoadManager();
+
+			for (var i = 0; i < MAX; i++) {
+				// random error on purpose
+				if (Math.random() > 0.5)
+					manager.add("imgs/" + i + ".jpg?cc=" + (Math.random() * 1000 >> 0), i);
+				else
+					manager.add("foo.jpg", i); // nothing file
+			}
+
+			manager.onProgress = function (event) {
+				var img = event.data.image;
+				var id = event.data.extra;
+				img.width = img.height = 128; // resize only demo needs
+
+				$("#thumb_" + id).append(img).css({"background-image":"none"});
+				$(img).css({opacity:0}).animate({opacity:1}, 300);
+			};
+
+			manager.onError = function (event) {
+				var id = event.data.extra;
+				$("#thumb_" + id)
+						.html("ERROR!")
+						.css({"background-image":"none"});
+			};
+
+			manager.onComplete = function (event) {
+				var fails = event.target.getFailedItems();
+				var str = "[Filed Url] ";
+				for (var i = 0; i < fails.length; i++) {
+					str += fails[i].url + " ";
+				}
+				$("#log").html(str);
+			};
+
+			manager.start();
+		}
+	</script>
+</head>
+
+<body onload="init();">
+<div>
+	<h1 id="text0">LoadManager.js - Error Example</h1>
+
+	<div id="container"></div>
+
+	<br style="clear:both;">
+
+	<p id="log"></p>
+
+	<p id="copyright">&copy; copyright 2012, <a href="http://clockmaker.jp/">clockmaker.jp</a></p>
+</div>
+</body>
+</html>
