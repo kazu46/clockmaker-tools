@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>ShuffleElementText.js Example</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Ropa+Sans' rel='stylesheet' type='text/css'>
+	<link href='style.css' rel='stylesheet' type='text/css'>
+	<script>
+		function init() {
+			var MAX = 40;
+			for (var i = 0; i < MAX; i++) {
+				$("#container").append('<div class="thumb"><img width="128" height="128" src="imgs/' + i + '.jpg?cc=' + (Math.random() * 10000 >> 0) + '" /></div>');
+			}
+		}
+	</script>
+</head>
+
+<body onload="init();">
+<h1 id="text0">&lt;img&gt; tag Loading Demo</h1>
+
+<div id="container">
+</div>
+<br style="clear:both;">
+
+<p id="copyright">&copy; copyright 2012, <a href="http://clockmaker.jp/">clockmaker.jp</a></p>
+</body>
+</html>

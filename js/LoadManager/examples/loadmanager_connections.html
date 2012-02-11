@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>LoadManager.js - Connections Example</title>
+	<script src="../src/LoadManager.js"></script>
+	<script src="jquery-1.7.1.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Ropa+Sans' rel='stylesheet' type='text/css'>
+	<link href='style.css' rel='stylesheet' type='text/css'>
+	<script>
+		function init() {
+			var MAX = 40;
+			for (var i = 0; i < MAX; i++) {
+				$("#container").append('<div id="thumb_' + i + '" class="thumb"></div>');
+			}
+
+			var manager = new LoadManager();
+
+			for (var i = 0; i < MAX; i++) {
+				manager.add("imgs/" + i + ".jpg?cc=" + (Math.random() * 1000 >> 0), {id:i});
+			}
+
+			manager.onProgress = function (event) {
+				var img = event.image;
+				var id = event.extra.id;
+				img.width = img.height = 128; // resize only demo needs
+
+				$("#thumb_" + id).append(img).css({"background-image":"none"});
+				$(img).css({opacity:0}).animate({opacity:1}, 300);
+			};
+
+			// number of net connections
+			// larger is faster
+			manager.start(1);
+		}
+	</script>
+</head>
+
+<body onload="init();">
+<div>
+	<h1 id="text0">LoadManager.js - Connections Example</h1>
+
+	<div id="container"></div>
+
+	<br style="clear:both;">
+
+	<p id="copyright">&copy; copyright 2012, <a href="http://clockmaker.jp/">clockmaker.jp</a></p>
+</div>
+</body>
+</html>

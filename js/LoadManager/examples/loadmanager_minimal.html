@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LoadManager.js - Progress Example</title>
+    <meta charset="UTF-8">
+    <script src="../src/LoadManager.js"></script>
+    <link href='style.css' rel='stylesheet' type='text/css'>
+    <script>
+        function init() {
+            var manager = new LoadManager();
+
+            for (var i = 0; i < 20; i++) {
+                manager.add("imgs/" + i + ".jpg", {id:i});
+            }
+
+            manager.onProgress = function (event) {
+                var img = event.data.image;
+                var id = event.data.extra.id;
+
+                document.getElementById("thumb_" + id).appendChild(img);
+            };
+
+            manager.start();
+        }
+    </script>
+</head>
+
+<body onload="init();">
+<div>
+    <h1 id="text0">LoadManager.js - Minimal Example</h1>
+
+    <div id="container">
+        <div id="thumb_0" class="pict"></div>
+        <div id="thumb_1" class="pict"></div>
+        <div id="thumb_2" class="pict"></div>
+        <div id="thumb_3" class="pict"></div>
+        <div id="thumb_4" class="pict"></div>
+        <div id="thumb_5" class="pict"></div>
+        <div id="thumb_6" class="pict"></div>
+        <div id="thumb_7" class="pict"></div>
+        <div id="thumb_8" class="pict"></div>
+        <div id="thumb_9" class="pict"></div>
+        <div id="thumb_10" class="pict"></div>
+        <div id="thumb_11" class="pict"></div>
+        <div id="thumb_12" class="pict"></div>
+        <div id="thumb_13" class="pict"></div>
+        <div id="thumb_14" class="pict"></div>
+        <div id="thumb_15" class="pict"></div>
+        <div id="thumb_16" class="pict"></div>
+        <div id="thumb_17" class="pict"></div>
+        <div id="thumb_18" class="pict"></div>
+        <div id="thumb_19" class="pict"></div>
+    </div>
+
+    <br style="clear:both;">
+
+    <p id="copyright">&copy; copyright 2012, <a href="http://clockmaker.jp/">clockmaker.jp</a></p>
+</div>
+</body>
+</html>
