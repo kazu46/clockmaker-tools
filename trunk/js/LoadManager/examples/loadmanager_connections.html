@@ -21,8 +21,8 @@
 			}
 
 			manager.onProgress = function (event) {
-				var img = event.image;
-				var id = event.extra.id;
+				var img = event.data.image;
+				var id = event.data.extra.id;
 				img.width = img.height = 128; // resize only demo needs
 
 				$("#thumb_" + id).append(img).css({"background-image":"none"});

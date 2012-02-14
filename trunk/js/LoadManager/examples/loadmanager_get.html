@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LoadManager.js - get() Example</title>
+    <meta charset="UTF-8">
+    <script src="../src/LoadManager.js"></script>
+    <link href='style.css' rel='stylesheet' type='text/css'>
+    <script>
+        function init() {
+            var manager = new LoadManager();
+
+			manager.add("imgs/0.jpg");
+			manager.add("imgs/1.jpg");
+			manager.add("imgs/2.jpg");
+			manager.add("imgs/3.jpg");
+			manager.add("imgs/4.jpg");
+
+			manager.onComplete = function(){
+				// get() メソッドで画像参照が可能
+				var img0 = manager.get("imgs/0.jpg").image;
+				var img1 = manager.get("imgs/1.jpg").image;
+				var img2 = manager.get("imgs/2.jpg").image;
+				var img3 = manager.get("imgs/3.jpg").image;
+				var img4 = manager.get("imgs/4.jpg").image;
+
+				document.getElementById("thumb_0").appendChild(img0);
+				document.getElementById("thumb_1").appendChild(img1);
+				document.getElementById("thumb_2").appendChild(img2);
+				document.getElementById("thumb_3").appendChild(img3);
+				document.getElementById("thumb_4").appendChild(img4);
+			}
+
+            manager.start();
+        }
+    </script>
+</head>
+
+<body onload="init();">
+<div>
+    <h1 id="text0">LoadManager.js - get() Example</h1>
+
+    <div id="container">
+        <div id="thumb_0" class="pict"></div>
+        <div id="thumb_1" class="pict"></div>
+        <div id="thumb_2" class="pict"></div>
+        <div id="thumb_3" class="pict"></div>
+        <div id="thumb_4" class="pict"></div>
+    </div>
+
+    <br style="clear:both;">
+
+    <p id="copyright">&copy; copyright 2012, <a href="http://clockmaker.jp/">clockmaker.jp</a></p>
+</div>
+</body>
+</html>

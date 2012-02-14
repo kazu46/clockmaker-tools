@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LoadManager.js - getSuccessItems() Example</title>
+    <meta charset="UTF-8">
+    <script src="../src/LoadManager.js"></script>
+    <link href='style.css' rel='stylesheet' type='text/css'>
+    <script>
+        function init() {
+            var manager = new LoadManager();
+
+			manager.add("imgs/0.jpg");
+			manager.add("imgs/1.jpg");
+			manager.add("imgs/2.jpg");
+			manager.add("imgs/3.jpg");
+			manager.add("imgs/4.jpg");
+
+			manager.onComplete = function(){
+				// getSuccessItems() メソッドで読み込みに成功したアイテムの取得が可能
+				var arr = manager.getSuccessItems();
+
+				for(var i=0; i<arr.length; i++){
+					var item = arr[i]; // 配列の各要素は LoadingData オブジェクトです
+					var img = item.image;
+					document.getElementById("thumb_" + i).appendChild(img);
+				}
+			}
+
+            manager.start();
+        }
+    </script>
+</head>
+
+<body onload="init();">
+<div>
+    <h1 id="text0">LoadManager.js - getSuccessItems() Example</h1>
+
+    <div id="container">
+        <div id="thumb_0" class="pict"></div>
+        <div id="thumb_1" class="pict"></div>
+        <div id="thumb_2" class="pict"></div>
+        <div id="thumb_3" class="pict"></div>
+        <div id="thumb_4" class="pict"></div>
+    </div>
+
+    <br style="clear:both;">
+
+    <p id="copyright">&copy; copyright 2012, <a href="http://clockmaker.jp/">clockmaker.jp</a></p>
+</div>
+</body>
+</html>
