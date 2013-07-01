@@ -1,5 +1,4 @@
 /*
- /*
  * LoadManager by Yasunobu Ikeda. April 20, 2010
  * Visit http://clockmaker.jp/ for documentation, updates and examples.
  *
@@ -143,6 +142,7 @@ lmlib.ErrorEvent = function () {
  * @constructor
  */
 function LoadManager() {
+	this.initialize();
 }
 
 /**
@@ -184,14 +184,14 @@ LoadManager._delegate = function (func, thisObj) {
 LoadManager.prototype = {
 
 	/** URLリスト */
-	_queueArr:[],
-	_registerArr:[],
-	_successArr:[],
-	_errorArr:[],
+	_queueArr:null,
+	_registerArr:null,
+	_successArr:null,
+	_errorArr:null,
 	_isStarted:false,
 	_isRunning:false,
 	_isFinished:false,
-	_currentQueues:[],
+	_currentQueues:null,
 	_queueCount:0,
 	/**
 	 * 同時接続数です。デフォルトは6です。
@@ -222,6 +222,26 @@ LoadManager.prototype = {
 	 * @type Number
 	 */
 	logLevel:LoadManager.LOG_SILENT,
+
+	/**
+	 * コンストラクタです。
+	 */
+	initialize: function (){
+		this._queueArr = [];
+		this._registerArr = [];
+		this._successArr = [];
+		this._errorArr = [];
+		this._isStarted = false;
+		this._isRunning = false;
+		this._isFinished = false;
+		this._currentQueues = [];
+		this._queueCount = 0;
+		this.numConnections = 6;
+		this.onProgress = null;
+		this.onComplete = null;
+		this.onError = null;
+		this.logLevel = LoadManager.LOG_SILENT;
+	},
 
 	/**
 	 * 処理が走っているかどうかを取得します。
